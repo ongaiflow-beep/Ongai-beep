@@ -7,9 +7,13 @@ crossed-box placeholders and all copy is rendered as greeked gray bars.
 
 ## How to view
 
-Open `flow.html` in any browser (no build step, no dependencies). It is the
-index/launcher and shows how each screen maps to the user flow. You can also
-open `index.html` (the Home wireframe) and click through the navigation.
+**Quickest:** open `preview/victory-wireframes.pdf` — every screen rendered to
+one page. Individual PNGs are in `preview/` too.
+
+**Interactive:** open `flow.html` in any browser (no build step, no
+dependencies). It is the index/launcher and shows how each screen maps to the
+user flow. You can also open `index.html` (the Home wireframe) and click through
+the navigation.
 
 ```
 # optional: serve locally so relative links behave like production
