@@ -1,0 +1,530 @@
+/* ===========================================================================
+   OngaiFlow — Visual Guidebook
+   A minimalist, zero-dependency brand-guide deck. 16:9 pages, print-to-PDF.
+   Design tokens are derived 1:1 from the OngaiFlow Figma:
+     lime #DAED00 · ink #141105 · paper #FFFFFF · Inter (Light / Bold)
+   =========================================================================== */
+
+/* ---- Tokens -------------------------------------------------------------- */
+:root {
+  /* Brand palette — the only three values in the system */
+  --lime:  #daed00;
+  --ink:   #141105;
+  --paper: #ffffff;
+
+  /* Functional tints of ink — hairlines and secondary type, not new colors */
+  --ink-70: rgba(20, 17, 5, 0.66);
+  --ink-45: rgba(20, 17, 5, 0.45);
+  --ink-28: rgba(20, 17, 5, 0.28);
+  --line:        rgba(20, 17, 5, 0.16);
+  --line-strong: rgba(20, 17, 5, 0.42);
+
+  /* Lime tints for the ink pages */
+  --lime-60: rgba(218, 237, 0, 0.6);
+  --lime-28: rgba(218, 237, 0, 0.28);
+
+  --stage: #0c0a03;           /* the surface the pages float on */
+  --construct: #ecebe4;       /* construction fill, matches Figma's grey */
+
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+
+  /* Page geometry (faithful to Figma's 41px / 31px margins on 1920×1080) */
+  --mx: 2.15cqw;              /* horizontal page margin */
+  --my: 2.9cqh;              /* vertical page margin   */
+}
+
+/* ---- Reset -------------------------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-weight: 300;
+  color: var(--ink);
+  background: var(--stage);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+svg { display: block; }
+p   { margin: 0; }
+ol, ul { margin: 0; padding: 0; list-style: none; }
+
+/* ===========================================================================
+   Deck + page framework
+   Each .slide is one vertical scroll-snap stop; .page is the 16:9 artboard.
+   Everything inside is sized in container-query units so the artboard scales
+   as one piece, exactly like a Figma frame.
+   =========================================================================== */
+.deck {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.deck::-webkit-scrollbar { width: 0; height: 0; }
+
+.slide {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  scroll-snap-align: center;
+  padding: 3.2vh 3vw;
+}
+
+.page {
+  position: relative;
+  width: min(94vw, calc((100vh - 7vh) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  container-type: size;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: 0 2.4rem 5rem -1.5rem rgba(0, 0, 0, 0.7);
+}
+
+/* Inner frame: establishes the base type size for the whole artboard.
+   0.835cqw ≈ 16px at a 1920-wide page; all type below is set in em off this. */
+.page__frame {
+  position: absolute;
+  inset: 0;
+  padding: var(--my) var(--mx);
+  display: flex;
+  flex-direction: column;
+  font-size: 0.835cqw;
+  line-height: 1.45;
+}
+
+/* ---- Running chrome: header + folio (the "guidebook" signature) ---------- */
+.meta {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1em;
+}
+.meta__label  { font-weight: 700; font-size: 0.75em; letter-spacing: 0.01em; }
+.meta__sub {
+  margin-top: 0.55em;
+  display: flex;
+  gap: 1.8em;
+  font-size: 0.75em;
+  color: var(--ink-70);
+}
+.meta__book {
+  font-size: 0.75em;
+  color: var(--ink-70);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.folio {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 0.7em;
+  color: var(--ink-45);
+  letter-spacing: 0.06em;
+}
+.folio__n { font-weight: 700; color: var(--ink-70); font-variant-numeric: tabular-nums; }
+
+/* Corner registration ticks — a quiet draughtsman's flourish */
+.regmark {
+  position: absolute;
+  width: 1.1em;
+  height: 1.1em;
+  border: 1px solid var(--line-strong);
+  z-index: 2;
+  pointer-events: none;
+}
+.regmark.tl { top: var(--my); left: var(--mx); border-right: 0; border-bottom: 0; }
+.regmark.tr { top: var(--my); right: var(--mx); border-left: 0; border-bottom: 0; }
+.regmark.bl { bottom: var(--my); left: var(--mx); border-right: 0; border-top: 0; }
+.regmark.br { bottom: var(--my); right: var(--mx); border-left: 0; border-top: 0; }
+
+/* ---- Ink (dark) page variant -------------------------------------------- */
+.page--ink { background: var(--ink); color: var(--paper); }
+.page--ink .meta__label { color: var(--paper); }
+.page--ink .meta__book,
+.page--ink .meta__sub  { color: var(--lime-60); }
+.page--ink .folio      { color: rgba(255, 255, 255, 0.5); }
+.page--ink .folio__n   { color: var(--lime); }
+.page--ink .regmark    { border-color: var(--lime-28); }
+
+/* ===========================================================================
+   Shared type helpers
+   =========================================================================== */
+.eyebrow {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-45);
+}
+.page--ink .eyebrow { color: var(--lime); }
+
+.lead {
+  font-size: 1.45em;
+  font-weight: 300;
+  line-height: 1.42;
+  max-width: 22em;
+  color: var(--ink-70);
+}
+.page--ink .lead { color: rgba(255, 255, 255, 0.78); }
+
+.kicker { color: var(--lime); }
+
+/* The logomark — a continuous ring, the "O" of Ongai. fill follows color.
+   display:block so width/height apply outside flex/grid parents too. */
+.mark { color: var(--ink); display: block; }
+.mark svg { width: 100%; height: 100%; fill: currentColor; }
+
+/* Wordmark lockup */
+.wordmark {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+/* ===========================================================================
+   01 · Cover
+   =========================================================================== */
+.cover .body { flex-direction: column; justify-content: center; align-items: flex-start; }
+.cover__lockup { display: flex; align-items: center; gap: 1.1em; }
+.cover__mark { width: 7.2em; height: 7.2em; color: var(--lime); }
+.cover .wordmark { font-size: 8.4em; color: var(--paper); }
+.cover__tag {
+  margin-top: 1.4em;
+  font-size: 1.5em;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.82);
+}
+.cover__tag b { font-weight: 700; color: var(--lime); }
+.cover .eyebrow { margin-bottom: 1.8em; }
+
+/* ===========================================================================
+   02 · Contents
+   =========================================================================== */
+.contents .body { align-items: stretch; }
+.toc { width: 100%; align-self: center; }
+.toc li {
+  display: grid;
+  grid-template-columns: 3.4em 1fr auto;
+  align-items: baseline;
+  gap: 1.4em;
+  padding: 0.92em 0;
+  border-top: 1px solid var(--line);
+  font-size: 1.5em;
+}
+.toc li:last-child { border-bottom: 1px solid var(--line); }
+.toc__n   { font-weight: 700; color: var(--lime); font-variant-numeric: tabular-nums; }
+.toc__t   { font-weight: 300; }
+.toc__t b { font-weight: 700; }
+.toc__pg  { font-size: 0.62em; color: var(--ink-45); letter-spacing: 0.08em; }
+
+/* ===========================================================================
+   03 · Logo — the mark
+   =========================================================================== */
+.logo .body { align-items: center; gap: 5em; }
+.logo__stage {
+  flex: 0 0 auto;
+  width: 38%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+}
+.logo__stage .mark { width: 56%; height: 56%; }
+.logo__text { flex: 1; display: flex; flex-direction: column; gap: 1.5em; }
+.logo__lockups { display: flex; gap: 1.1em; margin-top: 0.4em; }
+.swatch-mark {
+  width: 6.4em;
+  height: 6.4em;
+  display: grid;
+  place-items: center;
+  font-size: 1em;
+}
+.swatch-mark .mark { width: 58%; height: 58%; }
+.sm--paper { background: var(--paper); border: 1px solid var(--line); }
+.sm--paper .mark { color: var(--ink); }
+.sm--ink  { background: var(--ink); }
+.sm--ink  .mark { color: var(--paper); }
+.sm--lime { background: var(--lime); }
+.sm--lime .mark { color: var(--ink); }
+
+/* ===========================================================================
+   04 · Construction  (faithful reproduction of Figma slide 1)
+   =========================================================================== */
+.construct .body { align-items: center; justify-content: center; }
+.construct__draw { width: 100%; height: 100%; }
+.construct__draw svg { width: 100%; height: 100%; }
+
+/* SVG primitives shared by construction + clear-space drawings */
+.g-guide   { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 7 6; fill: none; }
+.g-frame   { stroke: var(--ink); stroke-width: 1.4; fill: none; }
+.g-circle  { stroke: var(--ink); stroke-width: 1.6; fill: none; }
+.g-dash    { stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 7 6; fill: none; }
+.g-fill    { fill: var(--construct); }
+.g-dim     { stroke: var(--ink-45); stroke-width: 1; fill: none; }
+.g-label   { font-family: var(--font); font-weight: 300; fill: var(--ink-70); font-size: 17px; }
+.g-inkfill { fill: var(--ink); }
+
+/* ===========================================================================
+   05 · Clear space & minimum size
+   =========================================================================== */
+.clear .body { align-items: stretch; gap: 4em; }
+.clear__col { flex: 1; display: flex; flex-direction: column; }
+.clear__col h3,
+.type__col h3,
+.misuse h3 {
+  margin: 0 0 1.1em;
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.clear__draw { flex: 1; min-height: 0; }
+.clear__draw svg { width: 100%; height: 100%; }
+.minsize { display: flex; gap: 2.4em; align-items: flex-end; margin-top: auto; }
+.minsize__item { text-align: center; }
+.minsize__item .mark { color: var(--ink); margin: 0 auto 0.7em; }
+.minsize__big   .mark { width: 5.2em; height: 5.2em; }
+.minsize__small .mark { width: 2.2em; height: 2.2em; }
+.minsize__v { font-weight: 700; font-size: 1.05em; }
+.minsize__k { font-size: 0.78em; color: var(--ink-45); }
+.note { font-size: 0.84em; color: var(--ink-70); line-height: 1.5; max-width: 24em; }
+
+/* ===========================================================================
+   06 · Color  (faithful reproduction of Figma slide 2)
+   =========================================================================== */
+.color .body { padding: 0; }
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  gap: 0;
+}
+.swatch {
+  position: relative;
+  padding: 1.7em 1.5em;
+  display: flex;
+  flex-direction: column;
+}
+.swatch--lime  { background: var(--lime);  color: var(--ink); }
+.swatch--ink   { background: var(--ink);   color: var(--lime); }
+.swatch--paper { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+.swatch__hex {
+  font-size: 1.5em;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+.swatch__role { margin-top: 0.5em; font-weight: 700; font-size: 0.92em; }
+.swatch__use  {
+  margin-top: auto;
+  font-size: 0.78em;
+  opacity: 0.72;
+  max-width: 16em;
+  line-height: 1.5;
+}
+.swatch--ink .swatch__use  { color: rgba(218, 237, 0, 0.7); opacity: 1; }
+.swatch--ink .swatch__role { color: var(--paper); }
+
+/* ===========================================================================
+   07 · Typography
+   =========================================================================== */
+.type .body { align-items: stretch; gap: 4em; }
+.type__col { flex: 1; display: flex; flex-direction: column; }
+.type__spec { flex: 0 0 38%; justify-content: center; }
+.type__aa {
+  font-size: 16em;
+  font-weight: 700;
+  line-height: 0.78;
+  letter-spacing: -0.04em;
+}
+.type__aa span { color: var(--lime); }
+.type__family { margin-top: 0.3em; font-weight: 700; font-size: 1.5em; }
+.type__weights { margin-top: 0.6em; font-size: 0.92em; color: var(--ink-70); }
+.type__weights b { color: var(--ink); }
+.type__scale { display: flex; flex-direction: column; justify-content: center; }
+.type__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 1.4em;
+  padding: 0.62em 0;
+  border-top: 1px solid var(--line);
+}
+.type__row:last-child { border-bottom: 1px solid var(--line); }
+.type__row .s-d { font-size: 2.1em; font-weight: 700; letter-spacing: -0.02em; }
+.type__row .s-t { font-size: 1.5em; font-weight: 700; }
+.type__row .s-b { font-size: 1.05em; font-weight: 300; }
+.type__row .s-c { font-size: 0.82em; font-weight: 300; color: var(--ink-70); }
+.type__row .s-k { font-size: 0.74em; color: var(--ink-45); letter-spacing: 0.04em; white-space: nowrap; }
+
+/* ===========================================================================
+   08 · Misuse
+   =========================================================================== */
+.misuse .body { flex-direction: column; }
+.dont-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1.2em;
+  min-height: 0;
+}
+.dont {
+  position: relative;
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 1.1em;
+  overflow: hidden;
+}
+.dont__art {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+.dont__art .mark { width: 40%; height: 70%; color: var(--ink); }
+.dont__cap { display: flex; align-items: baseline; gap: 0.6em; font-size: 0.86em; }
+.dont__x {
+  flex: 0 0 auto;
+  width: 1.35em; height: 1.35em;
+  display: grid; place-items: center;
+  background: var(--lime);
+  color: var(--ink);
+  font-weight: 700;
+  border-radius: 50%;
+  font-size: 0.92em;
+}
+.dont__cap b { font-weight: 700; }
+.dont__cap span { color: var(--ink-70); }
+/* the specific abuse each cell demonstrates */
+.dont--stretch  .mark { transform: scaleX(1.7); }
+.dont--outline  .mark path { fill: none; stroke: currentColor; stroke-width: 4; }
+.dont--recolor  .mark { color: #c8102e; }
+.dont--ghost    .mark { color: var(--line); }
+.dont--effect   .mark { filter: drop-shadow(0.12em 0.16em 0 var(--ink-28)); }
+.dont--crowd    .dont__art { padding: 0; }
+.dont--crowd    .mark { width: 78%; height: 92%; }
+
+/* ===========================================================================
+   09 · Contact  (ink page)
+   =========================================================================== */
+.contact .body { flex-direction: column; justify-content: center; align-items: flex-start; gap: 1.3em; }
+.contact__mark { width: 4.4em; height: 4.4em; color: var(--lime); }
+.contact h2 {
+  margin: 0;
+  font-size: 5.2em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--paper);
+}
+.contact h2 em { font-style: normal; color: var(--lime); }
+.contact__rows { display: flex; gap: 3.4em; margin-top: 0.8em; }
+.contact__rows div { display: flex; flex-direction: column; gap: 0.25em; }
+.contact__k { font-size: 0.74em; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime); }
+.contact__v { font-size: 1.1em; color: rgba(255, 255, 255, 0.9); }
+.contact__v a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--lime-60); }
+
+/* ===========================================================================
+   Navigation rail (progressive enhancement — deck works without JS)
+   =========================================================================== */
+.rail {
+  position: fixed;
+  right: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  z-index: 50;
+}
+.rail a {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+  transition: background 0.2s, transform 0.2s;
+}
+.rail a:hover { background: rgba(255, 255, 255, 0.6); }
+.rail a.is-active { background: var(--lime); transform: scale(1.35); }
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  z-index: 50;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+}
+.hint b { color: var(--lime); font-weight: 600; }
+
+/* Visible keyboard focus — quality floor */
+:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+
+/* ===========================================================================
+   Responsive — keep the artboard whole, just let it shrink
+   =========================================================================== */
+@media (max-width: 720px) {
+  .page { width: 96vw; }
+  .rail { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+
+/* ===========================================================================
+   Print — one landscape page per slide → a real PDF guidebook
+   =========================================================================== */
+@page { size: 297mm 167mm; margin: 0; }   /* 16:9 landscape */
+
+@media print {
+  body { background: #fff; }
+  .deck { height: auto; overflow: visible; display: block; }
+  .rail, .hint { display: none !important; }
+  .slide {
+    min-height: 0;
+    padding: 0;
+    display: block;
+    break-after: page;
+    page-break-after: always;
+  }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .page {
+    width: 100%;
+    height: 100vh;
+    box-shadow: none;
+    aspect-ratio: auto;
+  }
+  .page--ink { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .swatch, .swatch--lime, .swatch--ink, .cover, .contact {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+}
