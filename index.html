@@ -554,6 +554,19 @@
 <script>
 (function () {
 
+  /* ── Logo: replace SVG mark with custom image if set ── */
+  if (SITE.logo && SITE.logo.image) {
+    var lm = document.getElementById('logo-mark');
+    if (lm) {
+      var img = document.createElement('img');
+      img.src = SITE.logo.image;
+      img.alt = 'Ongai Flow logo';
+      img.setAttribute('aria-hidden', 'false');
+      img.style.cssText = 'height:32px;width:auto;object-fit:contain;display:block;';
+      lm.parentNode.replaceChild(img, lm);
+    }
+  }
+
   /* ── Wire social links from config ── */
   document.getElementById('link-ig').href = SITE.social.instagram;
   document.getElementById('link-li').href = SITE.social.linkedin;
