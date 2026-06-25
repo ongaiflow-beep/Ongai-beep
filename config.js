@@ -113,3 +113,15 @@ const SITE = {
   },
 
 };
+
+/* ── Admin overrides ──────────────────────────────────────────────
+   The admin panel (admin.html) saves changes here in localStorage.
+   Main pages automatically use them — no file editing needed.
+────────────────────────────────────────────────────────────────── */
+try {
+  const _saved = localStorage.getItem('ongai_content');
+  if (_saved) {
+    const _overrides = JSON.parse(_saved);
+    Object.keys(_overrides).forEach(function(k) { SITE[k] = _overrides[k]; });
+  }
+} catch(e) {}

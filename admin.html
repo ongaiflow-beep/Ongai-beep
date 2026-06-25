@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Ongai Flow</title>
+  <style>
+    :root {
+      --y:   #DAED00;
+      --dk:  #141105;
+      --wh:  #FFFFFF;
+      --mid: #1e1b0a;
+      --dim: rgba(255,255,255,.06);
+      --font:'system-ui',-apple-system,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font);background:#0f0e05;color:var(--wh);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+    /* ── LOGIN ── */
+    #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;}
+    .login-card{background:var(--mid);border:1px solid var(--dim);border-radius:12px;padding:3rem 2.5rem;width:100%;max-width:400px;}
+    .login-logo{display:flex;align-items:center;gap:.6rem;margin-bottom:2.5rem;}
+    .login-wordmark{font-weight:800;font-size:1.15rem;letter-spacing:-.02em;color:var(--wh);}
+    .login-label{display:block;font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:.5rem;letter-spacing:.04em;text-transform:uppercase;}
+    .login-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--wh);font-size:.95rem;font-family:var(--font);padding:.75rem 1rem;outline:none;transition:border-color .2s;}
+    .login-input:focus{border-color:var(--y);}
+    .login-btn{width:100%;margin-top:1.75rem;background:var(--y);color:var(--dk);font-family:var(--font);font-weight:700;font-size:.95rem;border:none;border-radius:7px;padding:.85rem;cursor:pointer;transition:background .2s;}
+    .login-btn:hover{background:#c9db00;}
+    .login-err{color:#ff6b6b;font-size:.82rem;margin-top:.75rem;display:none;}
+
+    /* ── SHELL ── */
+    #app{display:none;height:100vh;overflow:hidden;display:flex;}
+
+    /* Sidebar */
+    #sidebar{width:220px;min-width:220px;background:var(--mid);border-right:1px solid var(--dim);display:flex;flex-direction:column;padding:0;overflow-y:auto;}
+    .sb-head{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--dim);}
+    .sb-logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:.95rem;letter-spacing:-.02em;}
+    .sb-tag{font-size:.65rem;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.1em;margin-top:.25rem;}
+    .sb-nav{flex:1;padding:.75rem 0;}
+    .tab-btn{display:flex;align-items:center;gap:.6rem;width:100%;padding:.65rem 1.25rem;background:none;border:none;color:rgba(255,255,255,.45);font-family:var(--font);font-size:.875rem;cursor:pointer;text-align:left;transition:color .2s,background .2s;border-radius:0;}
+    .tab-btn svg{opacity:.5;transition:opacity .2s;flex-shrink:0;}
+    .tab-btn:hover{color:var(--wh);background:rgba(255,255,255,.04);}
+    .tab-btn:hover svg{opacity:.8;}
+    .tab-btn.active{color:var(--y);background:rgba(218,237,0,.07);}
+    .tab-btn.active svg{opacity:1;color:var(--y);}
+    .sb-foot{padding:1rem 1.25rem;border-top:1px solid var(--dim);}
+    .logout-btn{display:flex;align-items:center;gap:.5rem;width:100%;padding:.6rem .75rem;background:none;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.4);font-family:var(--font);font-size:.82rem;cursor:pointer;transition:all .2s;}
+    .logout-btn:hover{border-color:rgba(255,255,255,.25);color:var(--wh);}
+
+    /* Main */
+    #main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:.875rem 2rem;border-bottom:1px solid var(--dim);background:var(--mid);flex-shrink:0;}
+    .top-title{font-size:.9rem;font-weight:600;color:var(--wh);}
+    .top-actions{display:flex;gap:.75rem;}
+    .btn-save{background:var(--y);color:var(--dk);font-family:var(--font);font-weight:700;font-size:.82rem;border:none;border-radius:7px;padding:.55rem 1.25rem;cursor:pointer;transition:background .2s;}
+    .btn-save:hover{background:#c9db00;}
+    .btn-preview{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);font-family:var(--font);font-size:.82rem;border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.55rem 1.25rem;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-preview:hover{background:rgba(255,255,255,.12);color:var(--wh);}
+    .btn-export{background:transparent;color:rgba(255,255,255,.5);font-family:var(--font);font-size:.82rem;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:.55rem 1.25rem;cursor:pointer;transition:all .2s;}
+    .btn-export:hover{border-color:var(--y);color:var(--y);}
+
+    /* Content */
+    .content{flex:1;overflow-y:auto;padding:2rem;}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+
+    /* Form elements */
+    .section-title{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:1.25rem;}
+    .form-group{margin-bottom:1.5rem;}
+    .form-label{display:block;font-size:.8rem;color:rgba(255,255,255,.55);margin-bottom:.5rem;}
+    .form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--wh);font-size:.9rem;font-family:var(--font);padding:.65rem .875rem;outline:none;transition:border-color .2s;}
+    .form-input:focus{border-color:var(--y);}
+    .form-input::placeholder{color:rgba(255,255,255,.2);}
+    textarea.form-input{resize:vertical;min-height:90px;line-height:1.55;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .form-hint{font-size:.75rem;color:rgba(255,255,255,.25);margin-top:.35rem;line-height:1.5;}
+    .form-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1rem;position:relative;}
+    .form-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .form-card-num{font-size:.7rem;color:var(--y);font-weight:700;letter-spacing:.1em;}
+    .btn-remove{background:rgba(255,80,80,.12);color:#ff6b6b;border:none;border-radius:5px;padding:.3rem .65rem;font-size:.75rem;font-family:var(--font);cursor:pointer;transition:background .2s;}
+    .btn-remove:hover{background:rgba(255,80,80,.25);}
+    .btn-add{display:inline-flex;align-items:center;gap:.5rem;background:rgba(218,237,0,.08);color:var(--y);border:1px dashed rgba(218,237,0,.3);border-radius:7px;padding:.6rem 1.25rem;font-size:.82rem;font-family:var(--font);cursor:pointer;transition:all .2s;margin-top:.5rem;}
+    .btn-add:hover{background:rgba(218,237,0,.15);border-color:var(--y);}
+
+    /* Image upload */
+    .img-upload-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .img-preview{width:80px;height:55px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .img-preview img{max-width:100%;max-height:100%;object-fit:contain;}
+    .img-preview svg{opacity:.25;}
+    .img-btn{background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.5rem .875rem;font-size:.8rem;font-family:var(--font);cursor:pointer;transition:all .2s;}
+    .img-btn:hover{background:rgba(255,255,255,.12);color:var(--wh);}
+    input[type="file"]{display:none;}
+
+    /* Values list */
+    .value-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;}
+    .value-row .form-input{flex:1;}
+
+    /* Toggle */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .toggle-label{font-size:.875rem;color:rgba(255,255,255,.65);}
+    .toggle{position:relative;width:42px;height:24px;flex-shrink:0;}
+    .toggle input{opacity:0;width:0;height:0;position:absolute;}
+    .toggle-track{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:12px;cursor:pointer;transition:background .25s;}
+    .toggle input:checked + .toggle-track{background:var(--y);}
+    .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;transition:transform .25s;pointer-events:none;}
+    .toggle input:checked ~ .toggle-thumb{transform:translateX(18px);}
+
+    /* Toast */
+    #toast{position:fixed;bottom:2rem;right:2rem;background:var(--y);color:var(--dk);font-weight:700;font-size:.85rem;padding:.75rem 1.5rem;border-radius:8px;transform:translateY(120%);transition:transform .35s cubic-bezier(.22,1,.36,1);z-index:99;pointer-events:none;}
+    #toast.show{transform:translateY(0);}
+
+    /* Divider */
+    .divider{height:1px;background:rgba(255,255,255,.06);margin:2rem 0;}
+
+    /* Security tab */
+    .cred-info{background:rgba(218,237,0,.06);border:1px solid rgba(218,237,0,.2);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.85rem;color:rgba(255,255,255,.65);line-height:1.6;}
+    .cred-info strong{color:var(--y);}
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="32" height="22" viewBox="0 0 42 28" fill="none">
+        <circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none"/>
+        <line x1="31" y1="6"  x2="31" y2="22" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span class="login-wordmark">ongai flow. <span style="color:rgba(255,255,255,.25);font-weight:400;">admin</span></span>
+    </div>
+
+    <div class="form-group">
+      <label class="login-label" for="li-email">Email</label>
+      <input id="li-email" type="email" class="login-input" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label class="login-label" for="li-pass">Password</label>
+      <input id="li-pass" type="password" class="login-input" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div id="li-err" class="login-err">Incorrect email or password.</div>
+    <button class="login-btn" id="li-btn">Sign in</button>
+  </div>
+</div>
+
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app" style="display:none;">
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">
+        <svg width="26" height="18" viewBox="0 0 42 28" fill="none">
+          <circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none"/>
+          <line x1="31" y1="6"  x2="31" y2="22" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        ongai flow.
+      </div>
+      <div class="sb-tag">Admin panel</div>
+    </div>
+
+    <nav class="sb-nav">
+      <button class="tab-btn active" data-tab="general" onclick="showTab('general')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="3" fill="currentColor"/></svg>
+        General
+      </button>
+      <button class="tab-btn" data-tab="logo" onclick="showTab('logo')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M2 13l5-4 4 3 3-4 4 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Logo
+      </button>
+      <button class="tab-btn" data-tab="clients" onclick="showTab('clients')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="7" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M1 17c0-3 2.7-5 6-5M10 17c0-3 2.7-5 6-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Clients
+      </button>
+      <button class="tab-btn" data-tab="services" onclick="showTab('services')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h8M4 14h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Services
+      </button>
+      <button class="tab-btn" data-tab="work" onclick="showTab('work')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="4" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="11" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
+        Work
+      </button>
+      <button class="tab-btn" data-tab="about" onclick="showTab('about')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 18c0-4 3.1-7 7-7s7 3 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        About
+      </button>
+      <div style="height:1px;background:rgba(255,255,255,.06);margin:.5rem 1rem;"></div>
+      <button class="tab-btn" data-tab="security" onclick="showTab('security')">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Password
+      </button>
+    </nav>
+
+    <div class="sb-foot">
+      <button class="logout-btn" id="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4M13 14l4-4-4-4M17 10H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Sign out
+      </button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main-area">
+    <div class="top-bar">
+      <span class="top-title" id="top-label">General Settings</span>
+      <div class="top-actions">
+        <button class="btn-export" onclick="exportConfig()">Export config.js</button>
+        <a href="index.html" target="_blank" class="btn-preview">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M5 2H2a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M8 1h5m0 0v5M13 1L6 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Preview site
+        </a>
+        <button class="btn-save" onclick="saveAll()">Save changes</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── GENERAL ── -->
+      <div id="panel-general" class="tab-panel active">
+        <p class="section-title">Company Info</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Company name</label>
+            <input id="g-name" class="form-input" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact email</label>
+            <input id="g-email" class="form-input" type="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tagline</label>
+          <input id="g-tagline" class="form-input" type="text">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Copyright year</label>
+          <input id="g-year" class="form-input" type="text" style="max-width:120px;">
+        </div>
+
+        <div class="divider"></div>
+        <p class="section-title">Social Links</p>
+        <div class="form-group">
+          <label class="form-label">Instagram URL</label>
+          <input id="g-ig" class="form-input" type="url" placeholder="https://instagram.com/yourhandle">
+        </div>
+        <div class="form-group">
+          <label class="form-label">LinkedIn URL</label>
+          <input id="g-li" class="form-input" type="url" placeholder="https://linkedin.com/company/yourpage">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Behance URL</label>
+          <input id="g-bh" class="form-input" type="url" placeholder="https://behance.net/yourpage">
+        </div>
+
+        <div class="divider"></div>
+        <p class="section-title">Contact Form</p>
+        <div class="form-group">
+          <label class="form-label">Formspree endpoint</label>
+          <input id="g-form" class="form-input" type="url" placeholder="https://formspree.io/f/xxxxxxxx">
+          <p class="form-hint">Get a free endpoint at <strong style="color:rgba(255,255,255,.45);">formspree.io</strong> → New Form → copy the URL.</p>
+        </div>
+      </div>
+
+      <!-- ── LOGO ── -->
+      <div id="panel-logo" class="tab-panel">
+        <p class="section-title">Logo Image</p>
+        <div class="form-group">
+          <label class="form-label">Upload your logo (PNG, SVG, JPG)</label>
+          <div class="img-upload-row" style="margin-bottom:.75rem;">
+            <div class="img-preview" id="logo-preview">
+              <svg width="24" height="16" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </div>
+            <button class="img-btn" onclick="document.getElementById('logo-file').click()">Choose file</button>
+            <button class="img-btn" onclick="clearLogo()" style="color:rgba(255,80,80,.7);">Remove</button>
+          </div>
+          <input type="file" id="logo-file" accept="image/*" onchange="handleLogoUpload(this)">
+          <p class="form-hint">Replaces the default O* mark on all pages. Recommended: SVG or PNG with transparent background.</p>
+        </div>
+      </div>
+
+      <!-- ── CLIENTS ── -->
+      <div id="panel-clients" class="tab-panel">
+        <p class="section-title">Client Logos <span style="color:rgba(255,255,255,.2);font-weight:400;text-transform:none;letter-spacing:0;"> — shown in the strip below the hero</span></p>
+        <div id="clients-list"></div>
+        <button class="btn-add" onclick="addClient()">+ Add client</button>
+      </div>
+
+      <!-- ── SERVICES ── -->
+      <div id="panel-services" class="tab-panel">
+        <p class="section-title">Services</p>
+        <div id="services-list"></div>
+        <button class="btn-add" onclick="addService()">+ Add service</button>
+      </div>
+
+      <!-- ── WORK ── -->
+      <div id="panel-work" class="tab-panel">
+        <p class="section-title">Portfolio / Work</p>
+        <div id="work-list"></div>
+        <button class="btn-add" onclick="addWork()">+ Add project</button>
+      </div>
+
+      <!-- ── ABOUT ── -->
+      <div id="panel-about" class="tab-panel">
+        <p class="section-title">About Page</p>
+        <div class="form-group">
+          <label class="form-label">Headline</label>
+          <input id="ab-headline" class="form-input" type="text" placeholder="flowing to the core.">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Body text <span style="color:rgba(255,255,255,.25);">(HTML allowed: &lt;em&gt; for italic yellow)</span></label>
+          <textarea id="ab-body" class="form-input" rows="5"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quote</label>
+          <input id="ab-quote" class="form-input" type="text">
+        </div>
+
+        <div class="divider"></div>
+        <p class="section-title">Values</p>
+        <div id="values-list"></div>
+        <button class="btn-add" onclick="addValue()">+ Add value</button>
+
+        <div class="divider"></div>
+        <p class="section-title">Team Photo</p>
+        <div class="form-group">
+          <label class="form-label">Upload team / studio photo</label>
+          <div class="img-upload-row" style="margin-bottom:.75rem;">
+            <div class="img-preview" id="team-photo-preview" style="width:120px;height:80px;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 13l4-4 4 4 3-3 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <button class="img-btn" onclick="document.getElementById('team-photo-file').click()">Choose photo</button>
+            <button class="img-btn" onclick="clearTeamPhoto()" style="color:rgba(255,80,80,.7);">Remove</button>
+          </div>
+          <input type="file" id="team-photo-file" accept="image/*" onchange="handleTeamPhotoUpload(this)">
+        </div>
+
+        <div class="divider"></div>
+        <p class="section-title">Team Members <span style="color:rgba(255,255,255,.2);font-weight:400;text-transform:none;letter-spacing:0;"> — optional</span></p>
+        <div id="team-list"></div>
+        <button class="btn-add" onclick="addTeamMember()">+ Add team member</button>
+      </div>
+
+      <!-- ── SECURITY ── -->
+      <div id="panel-security" class="tab-panel">
+        <p class="section-title">Login Credentials</p>
+        <div class="cred-info">
+          Your current login email is shown below. Change your password anytime — you'll need to enter the current one to confirm.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Admin email</label>
+          <input id="sec-email" class="form-input" type="email">
+        </div>
+
+        <div class="divider"></div>
+        <p class="section-title">Change Password</p>
+        <div class="form-group">
+          <label class="form-label">Current password</label>
+          <input id="sec-cur" class="form-input" type="password" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label class="form-label">New password</label>
+          <input id="sec-new" class="form-input" type="password" placeholder="min. 8 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm new password</label>
+          <input id="sec-conf" class="form-input" type="password" placeholder="repeat new password">
+        </div>
+        <div id="sec-msg" style="font-size:.82rem;margin-top:.5rem;display:none;"></div>
+        <button class="btn-save" style="margin-top:1rem;" onclick="changePassword()">Update password</button>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-area -->
+</div><!-- /app -->
+
+<div id="toast">Saved!</div>
+
+
+<script>
+/* ══════════════════════════════════════════════════
+   CREDENTIALS  (SHA-256 hashes)
+   Email: ongaiflow@gmail.com
+   Password: OngaiFlow@2025
+══════════════════════════════════════════════════ */
+const CREDS_KEY = 'ongai_admin_creds';
+
+function getCredentials() {
+  const stored = localStorage.getItem(CREDS_KEY);
+  if (stored) return JSON.parse(stored);
+  return {
+    emailHash: '2391358e3c496efa87f56857d3f05ae33e10ddaa7dc2a9ce38f9e067d9652fa7',
+    passHash:  'ea8f08078b60e1cd4083a4983e8a943535e07e9bb46d733ad66579253ac9138c',
+  };
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ── Session ── */
+function isLoggedIn() { return sessionStorage.getItem('ongai_admin_session') === 'ok'; }
+function setSession()  { sessionStorage.setItem('ongai_admin_session', 'ok'); }
+function clearSession(){ sessionStorage.removeItem('ongai_admin_session'); }
+
+/* ── Login ── */
+document.getElementById('li-btn').addEventListener('click', doLogin);
+document.getElementById('li-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+
+async function doLogin() {
+  const email = document.getElementById('li-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('li-pass').value;
+  const eh = await sha256(email);
+  const ph = await sha256(pass);
+  const creds = getCredentials();
+  if (eh === creds.emailHash && ph === creds.passHash) {
+    setSession();
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadAll();
+  } else {
+    document.getElementById('li-err').style.display = 'block';
+    document.getElementById('li-pass').value = '';
+  }
+}
+
+document.getElementById('logout-btn').addEventListener('click', function() {
+  clearSession();
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('li-pass').value = '';
+  document.getElementById('li-err').style.display = 'none';
+});
+
+/* ── Init ── */
+if (isLoggedIn()) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  loadAll();
+}
+
+/* ── Tabs ── */
+const TAB_LABELS = { general:'General Settings', logo:'Logo', clients:'Client Logos', services:'Services', work:'Portfolio / Work', about:'About Page', security:'Password & Security' };
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelector('[data-tab="'+name+'"]').classList.add('active');
+  document.getElementById('top-label').textContent = TAB_LABELS[name] || name;
+}
+
+/* ── Data ── */
+const STORE_KEY = 'ongai_content';
+
+function getData() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  // Return defaults from config.js if available
+  if (typeof SITE !== 'undefined') return JSON.parse(JSON.stringify(SITE));
+  return {};
+}
+
+function saveData(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+/* ── Load all forms ── */
+function loadAll() {
+  const d = getData();
+
+  // General
+  document.getElementById('g-name').value    = d.name    || '';
+  document.getElementById('g-email').value   = d.email   || '';
+  document.getElementById('g-tagline').value = d.tagline || '';
+  document.getElementById('g-year').value    = d.year    || '';
+  document.getElementById('g-ig').value      = (d.social && d.social.instagram) || '';
+  document.getElementById('g-li').value      = (d.social && d.social.linkedin)  || '';
+  document.getElementById('g-bh').value      = (d.social && d.social.behance)   || '';
+  document.getElementById('g-form').value    = d.formEndpoint || '';
+
+  // Logo
+  const logoImg = d.logo && d.logo.image;
+  if (logoImg) {
+    document.getElementById('logo-preview').innerHTML = `<img src="${logoImg}">`;
+  }
+
+  // About
+  const ab = d.about || {};
+  document.getElementById('ab-headline').value = ab.headline || '';
+  document.getElementById('ab-body').value     = ab.body     || '';
+  document.getElementById('ab-quote').value    = ab.quote    || '';
+  if (ab.teamPhoto) {
+    document.getElementById('team-photo-preview').innerHTML = `<img src="${ab.teamPhoto}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+
+  // Security
+  const creds = getCredentials();
+  // Show email (we can't un-hash, so show stored value or default)
+  document.getElementById('sec-email').value = localStorage.getItem('ongai_admin_email') || 'ongaiflow@gmail.com';
+
+  // Dynamic lists
+  renderClients(d.clients || []);
+  renderServices(d.services || []);
+  renderWork(d.work || []);
+  renderValues((d.about && d.about.values) || []);
+  renderTeam((d.about && d.about.team) || []);
+}
+
+/* ── SAVE ALL ── */
+function saveAll() {
+  const d = getData();
+
+  d.name    = document.getElementById('g-name').value.trim();
+  d.email   = document.getElementById('g-email').value.trim();
+  d.tagline = document.getElementById('g-tagline').value.trim();
+  d.year    = document.getElementById('g-year').value.trim();
+  d.formEndpoint = document.getElementById('g-form').value.trim();
+  d.social = {
+    instagram: document.getElementById('g-ig').value.trim() || '#',
+    linkedin:  document.getElementById('g-li').value.trim() || '#',
+    behance:   document.getElementById('g-bh').value.trim() || '#',
+  };
+
+  // Logo (kept in data via img preview src if set)
+  const logoImgEl = document.querySelector('#logo-preview img');
+  if (!d.logo) d.logo = {};
+  d.logo.image = logoImgEl ? logoImgEl.src : '';
+
+  // About text
+  if (!d.about) d.about = {};
+  d.about.headline = document.getElementById('ab-headline').value.trim();
+  d.about.body     = document.getElementById('ab-body').value.trim();
+  d.about.quote    = document.getElementById('ab-quote').value.trim();
+  const tpEl = document.querySelector('#team-photo-preview img');
+  d.about.teamPhoto = tpEl ? tpEl.src : '';
+
+  // Clients
+  d.clients = collectClients();
+
+  // Services
+  d.services = collectServices();
+
+  // Work
+  d.work = collectWork();
+
+  // About values & team
+  d.about.values = collectValues();
+  d.about.team   = collectTeam();
+
+  saveData(d);
+  showToast('Changes saved!');
+}
+
+/* ── Toast ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ══════════════════════════════
+   CLIENTS
+══════════════════════════════ */
+function renderClients(list) {
+  const el = document.getElementById('clients-list');
+  el.innerHTML = '';
+  list.forEach((c, i) => {
+    el.innerHTML += `
+    <div class="form-card" id="client-card-${i}">
+      <div class="form-card-head">
+        <span class="form-card-num">CLIENT ${String(i+1).padStart(2,'0')}</span>
+        <button class="btn-remove" onclick="removeClient(${i})">Remove</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Client name</label>
+          <input id="cl-name-${i}" class="form-input" type="text" value="${esc(c.name||'')}">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Logo</label>
+          <div class="img-upload-row">
+            <div class="img-preview" id="cl-prev-${i}">
+              ${c.image ? `<img src="${c.image}">` : '<svg width="18" height="12" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none" opacity=".3"/></svg>'}
+            </div>
+            <button class="img-btn" onclick="document.getElementById('cl-file-${i}').click()">Upload</button>
+          </div>
+          <input type="file" id="cl-file-${i}" accept="image/*" onchange="handleClientLogo(this, ${i})">
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+function addClient() {
+  const d = getData();
+  const clients = collectClients();
+  clients.push({ name: 'New Client', image: '' });
+  d.clients = clients;
+  saveData(d);
+  renderClients(clients);
+}
+
+function removeClient(i) {
+  const clients = collectClients();
+  clients.splice(i, 1);
+  renderClients(clients);
+}
+
+function collectClients() {
+  const cards = document.querySelectorAll('[id^="client-card-"]');
+  return Array.from(cards).map((card, i) => {
+    const img = card.querySelector(`#cl-prev-${i} img`);
+    return { name: document.getElementById(`cl-name-${i}`).value.trim(), image: img ? img.src : '' };
+  });
+}
+
+function handleClientLogo(input, i) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const prev = document.getElementById(`cl-prev-${i}`);
+    prev.innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+/* ══════════════════════════════
+   SERVICES
+══════════════════════════════ */
+function renderServices(list) {
+  const el = document.getElementById('services-list');
+  el.innerHTML = '';
+  list.forEach((s, i) => {
+    el.innerHTML += `
+    <div class="form-card" id="svc-card-${i}">
+      <div class="form-card-head">
+        <span class="form-card-num">SERVICE ${String(i+1).padStart(2,'0')}</span>
+        <button class="btn-remove" onclick="removeService(${i})">Remove</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service title</label>
+        <input id="svc-title-${i}" class="form-input" type="text" value="${esc(s.title||'')}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Description</label>
+        <textarea id="svc-desc-${i}" class="form-input" rows="2">${esc(s.desc||'')}</textarea>
+      </div>
+    </div>`;
+  });
+}
+
+function addService() {
+  const list = collectServices();
+  list.push({ title: 'New Service', desc: 'Description of the service.' });
+  renderServices(list);
+}
+
+function removeService(i) {
+  const list = collectServices();
+  list.splice(i, 1);
+  renderServices(list);
+}
+
+function collectServices() {
+  const cards = document.querySelectorAll('[id^="svc-card-"]');
+  return Array.from(cards).map((_, i) => ({
+    title: document.getElementById(`svc-title-${i}`).value.trim(),
+    desc:  document.getElementById(`svc-desc-${i}`).value.trim(),
+  }));
+}
+
+/* ══════════════════════════════
+   WORK
+══════════════════════════════ */
+function renderWork(list) {
+  const el = document.getElementById('work-list');
+  el.innerHTML = '';
+  list.forEach((w, i) => {
+    const chk = w.tall ? 'checked' : '';
+    el.innerHTML += `
+    <div class="form-card" id="work-card-${i}">
+      <div class="form-card-head">
+        <span class="form-card-num">PROJECT ${String(i+1).padStart(2,'0')}</span>
+        <button class="btn-remove" onclick="removeWork(${i})">Remove</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Project name</label>
+          <input id="w-title-${i}" class="form-input" type="text" value="${esc(w.title||'')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input id="w-cat-${i}" class="form-input" type="text" value="${esc(w.category||'')}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Year</label>
+          <input id="w-year-${i}" class="form-input" type="text" value="${esc(w.year||'')}" style="max-width:120px;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link (URL or #)</label>
+          <input id="w-link-${i}" class="form-input" type="text" value="${esc(w.link||'#')}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image</label>
+        <div class="img-upload-row">
+          <div class="img-preview" id="w-prev-${i}" style="width:100px;height:65px;">
+            ${w.image ? `<img src="${w.image}" style="width:100%;height:100%;object-fit:cover;">` : '<svg width="18" height="12" viewBox="0 0 20 14" fill="none"><rect x="1" y="1" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5" opacity=".3"/></svg>'}
+          </div>
+          <div>
+            <button class="img-btn" onclick="document.getElementById('w-file-${i}').click()">Upload image</button>
+            <p class="form-hint" style="margin-top:.3rem;">Or paste a URL below</p>
+          </div>
+        </div>
+        <input type="file" id="w-file-${i}" accept="image/*" onchange="handleWorkImg(this, ${i})">
+        <input id="w-img-${i}" class="form-input" type="url" placeholder="https://... or assets/work/name.jpg" value="${esc(w.image||'')}" style="margin-top:.5rem;" oninput="updateWorkImgPreview(this, ${i})">
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Feature card (tall)</span>
+        <label class="toggle">
+          <input type="checkbox" id="w-tall-${i}" ${chk}>
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
+      </div>
+    </div>`;
+  });
+}
+
+function addWork() {
+  const list = collectWork();
+  list.push({ title: 'Project Name', category: 'Brand Identity', year: new Date().getFullYear().toString(), image: '', link: '#', tall: list.length === 0 });
+  renderWork(list);
+}
+
+function removeWork(i) {
+  const list = collectWork();
+  list.splice(i, 1);
+  renderWork(list);
+}
+
+function collectWork() {
+  const cards = document.querySelectorAll('[id^="work-card-"]');
+  return Array.from(cards).map((_, i) => ({
+    title:    document.getElementById(`w-title-${i}`).value.trim(),
+    category: document.getElementById(`w-cat-${i}`).value.trim(),
+    year:     document.getElementById(`w-year-${i}`).value.trim(),
+    link:     document.getElementById(`w-link-${i}`).value.trim() || '#',
+    image:    document.getElementById(`w-img-${i}`).value.trim(),
+    tall:     document.getElementById(`w-tall-${i}`).checked,
+  }));
+}
+
+function handleWorkImg(input, i) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const prev = document.getElementById(`w-prev-${i}`);
+    prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById(`w-img-${i}`).value = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function updateWorkImgPreview(input, i) {
+  const prev = document.getElementById(`w-prev-${i}`);
+  if (input.value) {
+    prev.innerHTML = `<img src="${input.value}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=''">`;
+  }
+}
+
+/* ══════════════════════════════
+   ABOUT: VALUES
+══════════════════════════════ */
+function renderValues(list) {
+  const el = document.getElementById('values-list');
+  el.innerHTML = '';
+  list.forEach((v, i) => {
+    el.innerHTML += `
+    <div class="value-row" id="val-row-${i}">
+      <input id="val-${i}" class="form-input" type="text" value="${esc(v)}">
+      <button class="btn-remove" onclick="removeValue(${i})">×</button>
+    </div>`;
+  });
+}
+
+function addValue() {
+  const list = collectValues();
+  list.push('New Value');
+  renderValues(list);
+}
+
+function removeValue(i) {
+  const list = collectValues();
+  list.splice(i, 1);
+  renderValues(list);
+}
+
+function collectValues() {
+  const rows = document.querySelectorAll('[id^="val-row-"]');
+  return Array.from(rows).map((_, i) => document.getElementById(`val-${i}`).value.trim()).filter(Boolean);
+}
+
+/* ══════════════════════════════
+   ABOUT: TEAM
+══════════════════════════════ */
+function renderTeam(list) {
+  const el = document.getElementById('team-list');
+  el.innerHTML = '';
+  list.forEach((m, i) => {
+    el.innerHTML += `
+    <div class="form-card" id="team-card-${i}">
+      <div class="form-card-head">
+        <span class="form-card-num">MEMBER ${String(i+1).padStart(2,'0')}</span>
+        <button class="btn-remove" onclick="removeTeamMember(${i})">Remove</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input id="tm-name-${i}" class="form-input" type="text" value="${esc(m.name||'')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role / Title</label>
+          <input id="tm-role-${i}" class="form-input" type="text" value="${esc(m.role||'')}">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Photo</label>
+        <div class="img-upload-row">
+          <div class="img-preview" id="tm-prev-${i}">
+            ${m.photo ? `<img src="${m.photo}">` : '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.5" opacity=".3"/><path d="M3 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".3"/></svg>'}
+          </div>
+          <button class="img-btn" onclick="document.getElementById('tm-file-${i}').click()">Upload photo</button>
+        </div>
+        <input type="file" id="tm-file-${i}" accept="image/*" onchange="handleTeamMemberPhoto(this, ${i})">
+      </div>
+    </div>`;
+  });
+}
+
+function addTeamMember() {
+  const list = collectTeam();
+  list.push({ name: 'Name', role: 'Role', photo: '' });
+  renderTeam(list);
+}
+
+function removeTeamMember(i) {
+  const list = collectTeam();
+  list.splice(i, 1);
+  renderTeam(list);
+}
+
+function collectTeam() {
+  const cards = document.querySelectorAll('[id^="team-card-"]');
+  return Array.from(cards).map((_, i) => {
+    const img = document.querySelector(`#tm-prev-${i} img`);
+    return { name: document.getElementById(`tm-name-${i}`).value.trim(), role: document.getElementById(`tm-role-${i}`).value.trim(), photo: img ? img.src : '' };
+  });
+}
+
+function handleTeamMemberPhoto(input, i) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const prev = document.getElementById(`tm-prev-${i}`);
+    prev.innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+/* ══════════════════════════════
+   LOGO
+══════════════════════════════ */
+function handleLogoUpload(input) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('logo-preview').innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function clearLogo() {
+  document.getElementById('logo-preview').innerHTML = `<svg width="24" height="16" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+}
+
+/* ══════════════════════════════
+   TEAM PHOTO
+══════════════════════════════ */
+function handleTeamPhotoUpload(input) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('team-photo-preview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function clearTeamPhoto() {
+  document.getElementById('team-photo-preview').innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>`;
+}
+
+/* ══════════════════════════════
+   SECURITY: CHANGE PASSWORD
+══════════════════════════════ */
+async function changePassword() {
+  const curPass  = document.getElementById('sec-cur').value;
+  const newPass  = document.getElementById('sec-new').value;
+  const confPass = document.getElementById('sec-conf').value;
+  const newEmail = document.getElementById('sec-email').value.trim().toLowerCase();
+  const msg = document.getElementById('sec-msg');
+
+  const creds = getCredentials();
+  const curHash = await sha256(curPass);
+
+  if (curHash !== creds.passHash) {
+    msg.textContent = 'Current password is incorrect.';
+    msg.style.color = '#ff6b6b';
+    msg.style.display = 'block';
+    return;
+  }
+  if (newPass.length < 8) {
+    msg.textContent = 'New password must be at least 8 characters.';
+    msg.style.color = '#ff6b6b';
+    msg.style.display = 'block';
+    return;
+  }
+  if (newPass !== confPass) {
+    msg.textContent = 'Passwords do not match.';
+    msg.style.color = '#ff6b6b';
+    msg.style.display = 'block';
+    return;
+  }
+
+  const newPassHash  = await sha256(newPass);
+  const newEmailHash = await sha256(newEmail);
+
+  localStorage.setItem(CREDS_KEY, JSON.stringify({ emailHash: newEmailHash, passHash: newPassHash }));
+  localStorage.setItem('ongai_admin_email', newEmail);
+
+  msg.textContent = 'Password updated successfully.';
+  msg.style.color = '#DAED00';
+  msg.style.display = 'block';
+  document.getElementById('sec-cur').value = '';
+  document.getElementById('sec-new').value = '';
+  document.getElementById('sec-conf').value = '';
+  showToast('Password updated!');
+}
+
+/* ══════════════════════════════
+   EXPORT config.js
+══════════════════════════════ */
+function exportConfig() {
+  saveAll();
+  const d = getData();
+
+  function jsVal(v) {
+    if (typeof v === 'string') return JSON.stringify(v);
+    if (typeof v === 'boolean') return String(v);
+    if (typeof v === 'number') return String(v);
+    return JSON.stringify(v);
+  }
+
+  const services = (d.services||[]).map(s => `    { title: ${jsVal(s.title)}, desc: ${jsVal(s.desc)} },`).join('\n');
+  const work = (d.work||[]).map(w => `    { title: ${jsVal(w.title)}, category: ${jsVal(w.category)}, year: ${jsVal(w.year)}, image: ${jsVal(w.image)}, link: ${jsVal(w.link)}, tall: ${w.tall} },`).join('\n');
+  const clients = (d.clients||[]).map(c => `    { name: ${jsVal(c.name)}, image: ${jsVal(c.image)} },`).join('\n');
+  const values = (d.about&&d.about.values||[]).map(v => `      ${jsVal(v)},`).join('\n');
+  const team = (d.about&&d.about.team||[]).map(m => `      { name: ${jsVal(m.name)}, role: ${jsVal(m.role)}, photo: ${jsVal(m.photo)} },`).join('\n');
+  const ab = d.about || {};
+
+  const out = `/**
+ * ONGAI FLOW — Site Configuration (exported from admin panel)
+ */
+const SITE = {
+  name: ${jsVal(d.name||'ongai flow.')},
+  tagline: ${jsVal(d.tagline||'')},
+  email: ${jsVal(d.email||'')},
+  year: ${jsVal(d.year||'2025')},
+  formEndpoint: ${jsVal(d.formEndpoint||'https://formspree.io/f/YOUR_FORM_ID')},
+  social: {
+    instagram: ${jsVal((d.social&&d.social.instagram)||'#')},
+    linkedin:  ${jsVal((d.social&&d.social.linkedin)||'#')},
+    behance:   ${jsVal((d.social&&d.social.behance)||'#')},
+  },
+  logo: { image: ${jsVal((d.logo&&d.logo.image)||'')} },
+  clients: [
+${clients}
+  ],
+  services: [
+${services}
+  ],
+  work: [
+${work}
+  ],
+  about: {
+    headline:  ${jsVal(ab.headline||'')},
+    body:      ${jsVal(ab.body||'')},
+    values:    [
+${values}
+    ],
+    quote:     ${jsVal(ab.quote||'')},
+    teamPhoto: ${jsVal(ab.teamPhoto||'')},
+    team: [
+${team}
+    ],
+  },
+};
+
+/* Admin overrides */
+try {
+  const _saved = localStorage.getItem('ongai_content');
+  if (_saved) { const _o = JSON.parse(_saved); Object.keys(_o).forEach(k => { SITE[k] = _o[k]; }); }
+} catch(e) {}
+`;
+
+  const blob = new Blob([out], { type: 'text/javascript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'config.js';
+  a.click();
+  showToast('config.js downloaded!');
+}
+
+/* ── Utility ── */
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+</script>
+</body>
+</html>
