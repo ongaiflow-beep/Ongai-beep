@@ -3,740 +3,694 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Ongai Flow — We are a business partner that helps your brand get noticed. Branding, effectively.">
+  <meta name="description" content="Ongai Flow — We help your brand get noticed. Branding, effectively.">
   <title>Ongai Flow. — Branding Agency</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans (body) + Barlow Condensed (display) -->
+  <!-- Fonts: Fontshare (primary) with Google Fonts fallback -->
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=excon@400,700,900&f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN (layout utilities only) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="config.js"></script>
 
   <style>
     /* ── Brand tokens ── */
     :root {
-      --y:   #DAED00;   /* electric yellow  */
-      --dk:  #141105;   /* near-black        */
-      --wh:  #FFFFFF;   /* white             */
-      --font-display: 'Barlow Condensed', 'Excon', sans-serif;
-      --font-body:    'Plus Jakarta Sans', 'Satoshi', system-ui, sans-serif;
+      --y:  #DAED00;
+      --dk: #141105;
+      --wh: #FFFFFF;
+      --font-display: 'Excon', 'Barlow Condensed', sans-serif;
+      --font-body:    'Satoshi', 'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
     /* ── Reset ── */
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     a { color: inherit; text-decoration: none; }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--font-body);
-      background: var(--dk);
-      color: var(--wh);
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { font-family: var(--font-body); background: var(--wh); color: var(--dk); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-    /* ── Color utilities ── */
+    /* ── Color helpers ── */
     .bg-y   { background-color: var(--y); }
     .bg-dk  { background-color: var(--dk); }
     .bg-wh  { background-color: var(--wh); }
     .text-y  { color: var(--y); }
     .text-dk { color: var(--dk); }
     .text-wh { color: var(--wh); }
-    .border-y { border-color: var(--y); }
+    .brand-em { font-style: italic; color: var(--y); }
 
-    /* ── Typography ── */
-    .font-display { font-family: var(--font-display); }
-    .font-body    { font-family: var(--font-body); }
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--y); border-radius: 4px; }
 
-    /* Fluid hero type */
-    .hero-text {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 9vw, 10rem);
-      font-weight: 900;
-      line-height: 0.9;
-      letter-spacing: -0.01em;
-      text-transform: uppercase;
+    /* ── NAVBAR ── */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      padding: 1.5rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: transform 0.4s cubic-bezier(.22,1,.36,1),
+                  background 0.35s ease, border-color 0.35s ease,
+                  backdrop-filter 0.35s ease;
+    }
+    #nav.scrolled-light {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(20,17,5,.07);
+    }
+    #nav.scrolled-dark {
+      background: rgba(20,17,5,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
-    .display-xl {
-      font-family: var(--font-display);
-      font-size: clamp(2.6rem, 7vw, 7.5rem);
-      font-weight: 900;
-      line-height: 0.92;
-      letter-spacing: -0.01em;
-    }
+    /* Theme: light bg → dark nav text */
+    #nav[data-theme="light"] .nav-wordmark { color: var(--dk); }
+    #nav[data-theme="light"] .nav-link { color: rgba(20,17,5,.45); }
+    #nav[data-theme="light"] .nav-link:hover { color: var(--dk); }
+    #nav[data-theme="light"] .ham-line { background: var(--dk); }
 
-    .display-lg {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 5.5rem);
-      font-weight: 900;
-      line-height: 0.94;
-      text-transform: uppercase;
-    }
+    /* Theme: dark bg → light nav text */
+    #nav[data-theme="dark"] .nav-wordmark { color: var(--wh); }
+    #nav[data-theme="dark"] .nav-link { color: rgba(255,255,255,.45); }
+    #nav[data-theme="dark"] .nav-link:hover { color: var(--wh); }
+    #nav[data-theme="dark"] .ham-line { background: var(--wh); }
 
-    /* ── Scroll reveal ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s cubic-bezier(.22,1,.36,1),
-                  transform 0.7s cubic-bezier(.22,1,.36,1);
+    .nav-wordmark {
+      font-family: var(--font-display); font-weight: 900; font-size: 1.1rem;
+      letter-spacing: -.02em; text-transform: lowercase;
+      transition: color 0.3s ease;
     }
-    .reveal.in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .reveal { opacity: 1; transform: none; transition: none; }
-    }
-
-    /* ── Navbar ── */
-    #nav { transition: background 0.35s ease, border-color 0.35s ease; }
-    #nav.scrolled {
-      background: var(--dk);
-      border-bottom: 1px solid rgba(218,237,0,0.18);
-    }
-
     .nav-link {
-      position: relative;
-      font-family: var(--font-body);
-      color: rgba(255,255,255,0.6);
-      font-size: 0.875rem;
-      transition: color 0.2s ease;
+      font-family: var(--font-body); font-size: 0.875rem;
+      position: relative; transition: color 0.25s ease;
     }
-    .nav-link:hover { color: #fff; }
     .nav-link::after {
-      content: '';
-      position: absolute;
-      left: 0; bottom: -2px;
-      width: 0; height: 1px;
-      background: var(--y);
+      content: ''; position: absolute; left: 0; bottom: -2px;
+      width: 0; height: 1px; background: var(--y);
       transition: width 0.3s ease;
     }
     .nav-link:hover::after { width: 100%; }
-
     .nav-cta {
-      font-family: var(--font-body);
-      font-weight: 700;
-      font-size: 0.875rem;
-      background: var(--y);
-      color: var(--dk);
-      padding: 0.625rem 1.25rem;
-      border-radius: 9999px;
-      transition: background 0.2s ease;
+      font-family: var(--font-body); font-weight: 600; font-size: .875rem;
+      background: var(--y); color: var(--dk);
+      padding: .6rem 1.4rem; border-radius: 9999px;
+      transition: background .2s ease, color .2s ease;
     }
-    .nav-cta:hover { background: #fff; }
+    .nav-cta:hover { background: var(--dk); color: var(--wh); }
+    #nav[data-theme="dark"] .nav-cta:hover { background: var(--wh); color: var(--dk); }
 
-    /* ── Mobile menu ── */
+    /* Hamburger */
+    .ham-line { display: block; width: 24px; height: 2px; transition: transform .3s ease, opacity .3s ease; }
+    #ham[aria-expanded="true"] #hl1 { transform: translateY(6px) rotate(45deg); }
+    #ham[aria-expanded="true"] #hl2 { opacity: 0; }
+    #ham[aria-expanded="true"] #hl3 { transform: translateY(-6px) rotate(-45deg); }
+
+    /* Mobile overlay */
     #mob-menu {
-      position: fixed; inset: 0; z-index: 40;
+      position: fixed; inset: 0; z-index: 45;
       background: var(--dk);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 2.5rem;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s ease;
     }
-    #mob-menu.open { pointer-events: all; opacity: 1; }
-
+    #mob-menu.open { opacity: 1; pointer-events: all; }
     .mob-link {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: clamp(2.5rem, 10vw, 4rem);
-      text-transform: uppercase;
-      color: #fff;
-      transition: color 0.2s ease;
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2.2rem, 8vw, 3.5rem); text-transform: uppercase;
+      color: rgba(255,255,255,.6); transition: color .2s ease;
     }
     .mob-link:hover { color: var(--y); }
 
+    /* ── Scroll reveal ── */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
     /* ── Marquee ── */
-    @keyframes marquee {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .marquee-inner {
-      display: flex;
-      white-space: nowrap;
-      animation: marquee 26s linear infinite;
-    }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+    .marquee-inner { display: flex; white-space: nowrap; animation: marquee 28s linear infinite; }
     .marquee-inner:hover { animation-play-state: paused; }
     @media (prefers-reduced-motion: reduce) { .marquee-inner { animation: none; } }
 
     /* ── Service cards ── */
     .svc-card {
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 2.5rem;
-      cursor: pointer;
-      transition: background 0.22s ease, border-color 0.22s ease;
+      padding: 2.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,.08);
+      cursor: default; transition: background .22s ease, padding-left .22s ease;
     }
-    @media (min-width: 768px) { .svc-card { padding: 3rem; } }
-
-    .svc-card:hover {
-      background: var(--y);
-      border-color: var(--y);
-    }
+    .svc-card:hover { background: var(--y); padding-left: 2.5rem; }
+    .svc-card:hover .svc-title,
     .svc-card:hover .svc-num,
-    .svc-card:hover h3,
-    .svc-card:hover p,
-    .svc-card:hover .svc-arrow {
-      color: var(--dk);
-    }
-
-    .svc-num   { color: rgba(255,255,255,0.22); font-size: 0.7rem; letter-spacing: 0.15em; font-family: var(--font-body); }
-    .svc-arrow { color: rgba(255,255,255,0.22); font-size: 1.25rem; transition: transform 0.2s ease; }
+    .svc-card:hover .svc-desc,
+    .svc-card:hover .svc-arrow { color: var(--dk); }
+    .svc-title { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; color: var(--wh); transition: color .22s ease; }
+    .svc-num   { font-family: var(--font-body); color: rgba(255,255,255,.2); font-size: .7rem; letter-spacing: .12em; transition: color .22s ease; }
+    .svc-desc  { font-family: var(--font-body); color: rgba(255,255,255,.38); font-size: .875rem; line-height: 1.65; transition: color .22s ease; }
+    .svc-arrow { color: rgba(255,255,255,.2); font-size: 1.1rem; transition: color .22s ease, transform .22s ease; }
     .svc-card:hover .svc-arrow { transform: translateX(4px); }
 
-    /* ── Portfolio cards ── */
+    /* ── Work cards ── */
     .work-card {
-      position: relative;
-      background: var(--dk);
-      overflow: hidden;
-      cursor: pointer;
+      position: relative; overflow: hidden; cursor: pointer;
+      background: #0e0d04;
     }
     .work-overlay {
       position: absolute; inset: 0;
       background: var(--y);
       display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 2rem;
-      opacity: 0;
-      transition: opacity 0.32s ease;
+      padding: 2rem; opacity: 0; transition: opacity .3s ease;
     }
     .work-card:hover .work-overlay { opacity: 1; }
 
-    /* ── Brand mark: italic underlined yellow ── */
-    .brand-mark {
-      font-style: italic;
-      color: var(--y);
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      text-decoration-thickness: 2px;
+    /* ── Client placeholder ── */
+    .client-ph {
+      width: 100px; height: 36px; border-radius: 4px;
+      background: #f0f0ee; display: flex; align-items: center; justify-content: center;
     }
+    .client-img { max-width: 100px; max-height: 40px; object-fit: contain; filter: grayscale(1); opacity: .5; transition: opacity .2s ease; }
+    .client-img:hover { opacity: .9; }
 
-    /* ── Buttons ── */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 0.75rem;
-      background: var(--y); color: var(--dk);
-      font-family: var(--font-body); font-weight: 700; font-size: 1rem;
-      padding: 1rem 2rem; border-radius: 9999px;
-      transition: background 0.2s ease;
-      cursor: pointer;
-    }
-    .btn-primary:hover { background: #fff; }
-    .btn-primary svg { transition: transform 0.2s ease; }
-    .btn-primary:hover svg { transform: translateX(4px); }
-
-    /* ── Value items ── */
+    /* ── Values ── */
     .value-item {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      font-style: italic;
-      color: var(--dk);
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--y);
-      margin-bottom: 0.5rem;
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.6rem, 3vw, 2.4rem); font-style: italic;
+      color: var(--dk); padding-bottom: .875rem; border-bottom: 2px solid var(--y);
+      margin-bottom: .375rem;
     }
 
-    /* ── Outline text ── */
-    .text-outline {
-      -webkit-text-stroke: 3px var(--dk);
-      color: transparent;
+    /* ── Contact form ── */
+    .field {
+      width: 100%; background: transparent;
+      border: none; border-bottom: 1px solid rgba(255,255,255,.15);
+      color: var(--wh); font-family: var(--font-body); font-size: 1rem;
+      padding: .875rem 0; outline: none; transition: border-color .2s ease;
+      -webkit-appearance: none; appearance: none;
     }
+    .field::placeholder { color: rgba(255,255,255,.3); }
+    .field:focus { border-bottom-color: var(--y); }
+    select.field option { background: var(--dk); }
+    .btn-send {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: var(--y); color: var(--dk);
+      font-family: var(--font-body); font-weight: 700; font-size: .95rem;
+      padding: .875rem 2rem; border-radius: 9999px; border: none;
+      cursor: pointer; transition: background .2s ease;
+      margin-top: .5rem;
+    }
+    .btn-send:hover:not(:disabled) { background: var(--wh); }
+    .btn-send:disabled { opacity: .6; cursor: wait; }
+    .form-msg { font-family: var(--font-body); font-size: .95rem; margin-top: 1.5rem; }
+    .form-msg.ok  { color: var(--y); }
+    .form-msg.err { color: #ff6b6b; }
 
-    /* ── About 2-col grid on desktop ── */
+    /* ── About 2-col grid ── */
     @media (min-width: 1024px) {
       .about-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--dk); }
-    ::-webkit-scrollbar-thumb { background: var(--y); border-radius: 4px; }
+    /* ── Outline text ── */
+    .text-outline { -webkit-text-stroke: 2px var(--dk); color: transparent; }
 
-    /* ── Hamburger animation ── */
-    .ham-line { display: block; width: 24px; height: 2px; background: #fff; transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease; }
-    #ham[aria-expanded="true"] #hl1 { transform: translateY(7px) rotate(45deg); }
-    #ham[aria-expanded="true"] #hl2 { opacity: 0; }
-    #ham[aria-expanded="true"] #hl3 { transform: translateY(-7px) rotate(-45deg); width: 24px; }
+    /* ── Section heading sizes ── */
+    .h-hero {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(3rem, 6vw, 7.5rem); line-height: .92;
+      letter-spacing: -.02em; text-transform: uppercase;
+    }
+    .h-section {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2.4rem, 5vw, 6rem); line-height: .92;
+      text-transform: uppercase;
+    }
+    .h-xl {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2.8rem, 8vw, 9rem); line-height: .9;
+      text-transform: uppercase;
+    }
+
+    /* Mobile padding */
+    .px-site { padding-left: clamp(1.5rem, 5vw, 4rem); padding-right: clamp(1.5rem, 5vw, 4rem); }
   </style>
 </head>
 <body>
 
 <!-- Skip nav -->
-<a href="#main" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"
-   onfocus="this.style.cssText='position:fixed;top:1rem;left:1rem;z-index:999;background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;padding:.5rem 1rem;border-radius:9999px;width:auto;height:auto;'"
-   onblur="this.style.cssText='position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;'">
+<a href="#main" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"
+   onfocus="Object.assign(this.style,{position:'fixed',top:'1rem',left:'1rem',zIndex:'999',background:'var(--y)',color:'var(--dk)',fontFamily:'var(--font-body)',fontWeight:'700',padding:'.5rem 1rem',borderRadius:'9999px',width:'auto',height:'auto'})"
+   onblur="Object.assign(this.style,{position:'absolute',left:'-9999px',width:'1px',height:'1px'})">
   Skip to content
 </a>
 
 
-<!-- ═══════════════════════════════════
-     NAVBAR
-══════════════════════════════════════ -->
-<nav id="nav" style="position:fixed;top:0;left:0;right:0;z-index:50;padding:1.25rem 3rem;"
-     class="flex items-center justify-between">
-
-  <!-- Logo mark -->
-  <a href="/" aria-label="Ongai Flow home" style="display:flex;align-items:center;gap:.75rem;">
-    <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <!-- O-arc: thick stroke with gap at upper-right ~45° -->
-      <path d="M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C15.18 2 17.99 3.52 19.8 5.9"
-            stroke="#DAED00" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <path d="M21 9C21.65 10.2 22 11.07 22 12C22 17.523 17.523 22 12 22"
-            stroke="#DAED00" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <!-- Asterisk (8-point geometric) centered at x=36, y=12 -->
-      <line x1="36" y1="4"  x2="36" y2="20" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
-      <line x1="28" y1="12" x2="44" y2="12" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
-      <line x1="30.3" y1="5.7"  x2="41.7" y2="18.3" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
-      <line x1="41.7" y1="5.7"  x2="30.3" y2="18.3" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
+<!-- ═══════ NAVBAR ═══════ -->
+<nav id="nav" data-theme="light" aria-label="Main navigation">
+  <a href="index.html" style="display:flex;align-items:center;gap:.7rem;" aria-label="Ongai Flow home">
+    <!-- Logo mark: circle O + 6-point asterisk -->
+    <svg id="logo-mark" width="42" height="28" viewBox="0 0 42 28" fill="none" aria-hidden="true">
+      <circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none"/>
+      <line x1="31" y1="6"  x2="31" y2="22" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/>
     </svg>
-    <span style="font-family:var(--font-display);font-weight:900;color:#fff;font-size:1.15rem;letter-spacing:-.01em;text-transform:lowercase;">ongai flow.</span>
+    <span class="nav-wordmark">ongai flow.</span>
   </a>
 
-  <!-- Desktop links -->
-  <div class="hidden md:flex items-center" style="gap:2rem;">
-    <a href="#work"     class="nav-link">Work</a>
-    <a href="#services" class="nav-link">Services</a>
-    <a href="#about"    class="nav-link">About</a>
-    <a href="mailto:ongaiflow@gmail.com" class="nav-cta" style="margin-left:.5rem;"
-       aria-label="Email Ongai Flow to start a project">Let's talk</a>
+  <div class="hidden md:flex items-center" style="gap:2.25rem;" id="nav-links-desktop">
+    <a href="work.html"     class="nav-link">Work</a>
+    <a href="services.html" class="nav-link">Services</a>
+    <a href="about.html"    class="nav-link">About</a>
+    <a href="#contact"      class="nav-cta" style="margin-left:.25rem;">Let's talk</a>
   </div>
 
-  <!-- Hamburger (mobile) -->
   <button id="ham" aria-label="Open menu" aria-expanded="false" aria-controls="mob-menu"
-          class="md:hidden" style="display:none;flex-direction:column;gap:5px;padding:.5rem;cursor:pointer;background:none;border:none;">
+          style="display:none;flex-direction:column;gap:5px;padding:.5rem;background:none;border:none;cursor:pointer;">
     <span class="ham-line" id="hl1"></span>
     <span class="ham-line" id="hl2"></span>
     <span class="ham-line" id="hl3" style="width:16px;"></span>
   </button>
 </nav>
 
-<!-- Show hamburger only on mobile via JS (avoids md:hidden fighting display:none) -->
-<script>
-  if (window.innerWidth < 768) {
-    document.getElementById('ham').style.display = 'flex';
-  }
-</script>
-
 <!-- Mobile menu -->
-<div id="mob-menu">
-  <a href="#work"     class="mob-link">Work</a>
-  <a href="#services" class="mob-link">Services</a>
-  <a href="#about"    class="mob-link">About</a>
-  <a href="mailto:ongaiflow@gmail.com"
-     style="background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;font-size:1.1rem;padding:.9rem 2.5rem;border-radius:9999px;margin-top:.5rem;">
+<div id="mob-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <a href="work.html"     class="mob-link">Work</a>
+  <a href="services.html" class="mob-link">Services</a>
+  <a href="about.html"    class="mob-link">About</a>
+  <a href="#contact"
+     style="margin-top:.5rem;font-family:var(--font-body);font-weight:700;font-size:1rem;background:var(--y);color:var(--dk);padding:.8rem 2.25rem;border-radius:9999px;">
     Let's talk
   </a>
 </div>
 
 
-<!-- ═══════════════════════════════════
-     MAIN
-══════════════════════════════════════ -->
+<!-- ═══════ MAIN ═══════ -->
 <main id="main">
 
-  <!-- ── HERO ─────────────────────────── -->
-  <section style="position:relative;min-height:100vh;background:var(--dk);display:flex;flex-direction:column;justify-content:center;padding:7rem 3rem 5rem;overflow:hidden;">
+  <!-- ── HERO ── (white, nav→light) -->
+  <section data-nav-theme="light" style="position:relative;min-height:100vh;background:var(--wh);display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+    <!-- Decorative asterisk -->
+    <div aria-hidden="true" style="position:absolute;top:-4%;right:-3%;font-family:var(--font-display);font-weight:900;font-size:clamp(18rem,45vw,60rem);color:var(--y);opacity:.07;line-height:1;user-select:none;pointer-events:none;letter-spacing:-.05em;">*</div>
 
-    <!-- Decorative large asterisk -->
-    <div aria-hidden="true" style="
-      position:absolute; top:8%; right:-1%;
-      font-family:var(--font-display); font-weight:900;
-      font-size:clamp(14rem,38vw,50rem);
-      color:var(--y); opacity:.06; line-height:1;
-      user-select:none; pointer-events:none;">*</div>
+    <div class="px-site" style="position:relative;z-index:1;max-width:1320px;margin:0 auto;padding-top:9rem;padding-bottom:6rem;width:100%;">
 
-    <!-- Content -->
-    <div style="position:relative;z-index:1;max-width:1400px;">
-
-      <p class="reveal" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:2.5rem;">
+      <p class="reveal" style="font-family:var(--font-body);color:rgba(20,17,5,.35);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;margin-bottom:3.5rem;">
         branding. effectively, not aesthetic.
       </p>
 
-      <h1 class="hero-text reveal" style="transition-delay:.07s;">
-        we are<br>
-        business<br>
-        partner that<br>
-        help your brand<br>
+      <h1 class="h-hero reveal" style="color:var(--dk);max-width:900px;transition-delay:.05s;">
+        we make<br>
+        your brand<br>
         <span class="text-y">noticed.</span>
       </h1>
 
-      <div class="reveal" style="display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem;margin-top:3rem;transition-delay:.17s;">
-        <a href="mailto:ongaiflow@gmail.com" class="btn-primary"
-           aria-label="Start a project — email ongaiflow@gmail.com">
+      <div class="reveal" style="display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem;margin-top:4rem;transition-delay:.12s;">
+        <a href="#contact" style="display:inline-flex;align-items:center;gap:.6rem;background:var(--dk);color:var(--wh);font-family:var(--font-body);font-weight:600;font-size:.95rem;padding:.875rem 2rem;border-radius:9999px;transition:background .2s ease;" onmouseover="this.style.background='var(--y)';this.style.color='var(--dk)'" onmouseout="this.style.background='var(--dk)';this.style.color='var(--wh)'">
           Start a project
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <path d="M3 9h12M11 4l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <a href="#work" style="font-family:var(--font-body);color:rgba(255,255,255,.5);font-size:.875rem;display:flex;align-items:center;gap:.5rem;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">
-          See our work <span class="text-y">↓</span>
+        <a href="work.html" style="font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.875rem;display:flex;align-items:center;gap:.4rem;transition:color .2s;" onmouseover="this.style.color='var(--dk)'" onmouseout="this.style.color='rgba(20,17,5,.4)'">
+          See our work <span style="color:var(--y);">→</span>
         </a>
       </div>
     </div>
 
-    <!-- Scroll line -->
-    <div class="reveal" style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;transition-delay:.35s;">
-      <div style="width:1px;height:56px;background:linear-gradient(to bottom, transparent, rgba(255,255,255,.2), transparent);"></div>
-      <span style="font-family:var(--font-body);color:rgba(255,255,255,.2);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;">scroll</span>
+    <!-- Scroll indicator -->
+    <div class="reveal" style="position:absolute;bottom:2.25rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;transition-delay:.25s;">
+      <div style="width:1px;height:48px;background:linear-gradient(to bottom,transparent,rgba(20,17,5,.15),transparent);"></div>
+      <span style="font-family:var(--font-body);color:rgba(20,17,5,.22);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;">scroll</span>
     </div>
   </section>
 
 
-  <!-- ── MARQUEE ────────────────────────── -->
-  <div class="bg-y" style="overflow:hidden;padding:.85rem 0;" aria-hidden="true">
+  <!-- ── CLIENTS ── (white, nav→light) -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:4rem 0;border-top:1px solid rgba(20,17,5,.06);border-bottom:1px solid rgba(20,17,5,.06);">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
+      <p style="font-family:var(--font-body);color:rgba(20,17,5,.28);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:2.5rem;">trusted by</p>
+      <div id="clients-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:3rem;"></div>
+    </div>
+  </section>
+  <script>
+  (function(){
+    const row = document.getElementById('clients-row');
+    SITE.clients.forEach(c => {
+      if (c.image) {
+        row.innerHTML += `<img src="${c.image}" alt="${c.name}" class="client-img">`;
+      } else {
+        row.innerHTML += `<div class="client-ph" title="${c.name}"><svg width="28" height="14" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#c8d800" stroke-width="3" fill="none" opacity=".4"/><line x1="31" y1="6" x2="31" y2="22" stroke="#c8d800" stroke-width="2" stroke-linecap="round" opacity=".4"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#c8d800" stroke-width="2" stroke-linecap="round" opacity=".4"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#c8d800" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg></div>`;
+      }
+    });
+  })();
+  </script>
+
+
+  <!-- ── MARQUEE ── -->
+  <div class="bg-y" style="overflow:hidden;padding:.8rem 0;" aria-hidden="true">
     <div class="marquee-inner">
-      <span style="font-family:var(--font-display);font-weight:700;color:var(--dk);font-size:.8rem;letter-spacing:.18em;white-space:nowrap;">
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--dk);font-size:.75rem;letter-spacing:.2em;">
         &nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;
       </span>
-      <span style="font-family:var(--font-display);font-weight:700;color:var(--dk);font-size:.8rem;letter-spacing:.18em;white-space:nowrap;" aria-hidden="true">
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--dk);font-size:.75rem;letter-spacing:.2em;" aria-hidden="true">
         &nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;
       </span>
     </div>
   </div>
 
 
-  <!-- ── ABOUT / PHILOSOPHY ─────────────── -->
-  <section id="about" class="bg-wh text-dk" style="padding:6rem 3rem;">
-    <div style="max-width:1280px;margin:0 auto;">
+  <!-- ── ABOUT PREVIEW ── (white, nav→light) -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:7rem 0 6rem;">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
 
-      <!-- 01 label -->
-      <div class="reveal" style="display:flex;align-items:flex-end;gap:1.25rem;margin-bottom:4rem;">
-        <span style="font-family:var(--font-display);font-weight:900;color:var(--y);font-size:clamp(3.5rem,9vw,6.5rem);line-height:1;">01</span>
-        <span style="font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:.75rem;">who we are</span>
+      <div class="reveal" style="display:flex;align-items:flex-end;gap:1rem;margin-bottom:5rem;">
+        <span style="font-family:var(--font-display);font-weight:900;font-size:clamp(3rem,7vw,5.5rem);color:var(--y);line-height:1;">01</span>
+        <span style="font-family:var(--font-body);color:rgba(20,17,5,.3);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:.6rem;">who we are</span>
       </div>
 
-      <!-- Two-col layout -->
-      <div class="about-grid" style="display:grid;gap:4rem;">
+      <div class="about-grid" style="display:grid;gap:5rem;align-items:start;">
 
-        <!-- Left: headline -->
         <div class="reveal">
-          <h2 class="display-xl text-dk">
-            flowing to<br>the core.
-          </h2>
+          <h2 class="h-section text-dk" style="line-height:1;">flowing to<br>the core.</h2>
+          <a href="about.html" style="display:inline-flex;align-items:center;gap:.5rem;margin-top:3rem;font-family:var(--font-body);font-size:.875rem;color:rgba(20,17,5,.45);border-bottom:1px solid rgba(20,17,5,.15);padding-bottom:.25rem;transition:color .2s ease,border-color .2s ease;" onmouseover="this.style.color='var(--dk)';this.style.borderColor='var(--dk)'" onmouseout="this.style.color='rgba(20,17,5,.45)';this.style.borderColor='rgba(20,17,5,.15)'">
+            Full story <span style="color:var(--y);">→</span>
+          </a>
         </div>
 
-        <!-- Right: copy + values -->
-        <div class="reveal" style="transition-delay:.13s;">
-          <p style="font-family:var(--font-body);color:rgba(20,17,5,.65);font-size:1.1rem;line-height:1.75;margin-bottom:3rem;">
-            We are a business partner that helps your brand get
-            <span class="brand-mark">noticed.</span> We identify the
-            core problems and give effective solutions — not just pretty
-            visuals. We help you build your brand like it is our own.
-            <span class="brand-mark">We take it serious.</span>
+        <div class="reveal" style="transition-delay:.1s;">
+          <p style="font-family:var(--font-body);color:rgba(20,17,5,.6);font-size:1.05rem;line-height:1.8;margin-bottom:3.5rem;max-width:520px;">
+            We are a business partner that helps your brand get <span style="font-style:italic;color:var(--y);">noticed.</span> We identify the core problems and give effective solutions — not just pretty visuals. We help you build your brand like it is our own.
           </p>
-
-          <!-- Values -->
-          <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <div style="display:flex;flex-direction:column;gap:.375rem;">
             <div class="value-item">Innovative</div>
             <div class="value-item">Creative</div>
             <div class="value-item">Adaptation</div>
           </div>
         </div>
-      </div>
 
-      <!-- Philosophy quote -->
-      <div class="reveal" style="margin-top:5rem;padding-top:4rem;border-top:1px solid rgba(20,17,5,.1);">
-        <p style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:clamp(1.6rem,4vw,3.5rem);line-height:1.1;">
-          "A Symbol Should Represent<br>
-          <span class="text-y">Personalities"</span>
-        </p>
       </div>
 
     </div>
   </section>
 
-  <!-- Yellow stripe -->
-  <div class="bg-y" style="height:5px;width:100%;"></div>
+  <div style="height:5px;background:var(--y);"></div>
 
 
-  <!-- ── SERVICES ──────────────────────── -->
-  <section id="services" class="bg-dk" style="padding:6rem 3rem;">
-    <div style="max-width:1280px;margin:0 auto;">
+  <!-- ── SERVICES PREVIEW ── (dark, nav→dark) -->
+  <section data-nav-theme="dark" style="background:var(--dk);padding:7rem 0 6rem;">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
 
-      <!-- 02 label -->
-      <div class="reveal" style="margin-bottom:3.5rem;">
-        <span style="font-family:var(--font-body);color:var(--y);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;">02 — services</span>
-      </div>
-
-      <!-- Heading -->
-      <h2 class="display-lg reveal text-wh" style="margin-bottom:4rem;transition-delay:.07s;">
-        what we <span class="text-y">do.</span>
-      </h2>
-
-      <!-- Grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));border-top:1px solid rgba(255,255,255,.08);">
-
-        <div class="svc-card">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
-            <span class="svc-num">01</span>
-            <span class="svc-arrow">→</span>
-          </div>
-          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Logo &amp;<br>Branding</h3>
-          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">A symbol that truly represents your brand personality — not just how good it looks.</p>
+      <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:5rem;">
+        <div>
+          <span style="font-family:var(--font-body);color:var(--y);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;display:block;margin-bottom:1.5rem;">02 — services</span>
+          <h2 class="h-section text-wh">what we <span class="text-y">do.</span></h2>
         </div>
-
-        <div class="svc-card">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
-            <span class="svc-num">02</span>
-            <span class="svc-arrow">→</span>
-          </div>
-          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Brand<br>Strategy</h3>
-          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">We flow to the core — identifying the real brand problem and building the right solution.</p>
-        </div>
-
-        <div class="svc-card">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
-            <span class="svc-num">03</span>
-            <span class="svc-arrow">→</span>
-          </div>
-          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Visual<br>Identity</h3>
-          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">A complete visual system — color, type, and layout — that says who you are without a word.</p>
-        </div>
-
-        <div class="svc-card">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
-            <span class="svc-num">04</span>
-            <span class="svc-arrow">→</span>
-          </div>
-          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Art<br>Direction</h3>
-          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">Creative direction that makes every visual asset speak the same brand language.</p>
-        </div>
-
-        <div class="svc-card">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
-            <span class="svc-num">05</span>
-            <span class="svc-arrow">→</span>
-          </div>
-          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Brand<br>Guidelines</h3>
-          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">Your brand rulebook — so your identity stays consistent at every touchpoint.</p>
-        </div>
-
-        <div class="svc-card">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
-            <span class="svc-num">06</span>
-            <span class="svc-arrow">→</span>
-          </div>
-          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Brand<br>Naming</h3>
-          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">A name is the first thing people hear. We help you find one that sticks and means something.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Service card hover — handle child color change via JS since CSS :hover on parent can't cascade to specific descendants reliably without CSS vars -->
-  <script>
-    document.querySelectorAll('.svc-card').forEach(card => {
-      const desc = card.querySelector('.svc-desc');
-      card.addEventListener('mouseenter', () => {
-        if (desc) desc.style.color = 'rgba(20,17,5,.6)';
-      });
-      card.addEventListener('mouseleave', () => {
-        if (desc) desc.style.color = 'rgba(255,255,255,.4)';
-      });
-    });
-  </script>
-
-
-  <!-- ── WORK / PORTFOLIO ──────────────── -->
-  <section id="work" class="bg-wh text-dk" style="padding:6rem 3rem;">
-    <div style="max-width:1280px;margin:0 auto;">
-
-      <!-- Label -->
-      <div class="reveal" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3.5rem;">
-        <span style="font-family:var(--font-body);color:rgba(20,17,5,.35);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;">03 — selected work</span>
-        <span style="font-family:var(--font-body);color:rgba(20,17,5,.3);font-size:.72rem;letter-spacing:.1em;">coming soon</span>
-      </div>
-
-      <!-- Heading with outline effect -->
-      <h2 class="reveal" style="font-family:var(--font-display);font-weight:900;font-size:clamp(2.8rem,8vw,7.5rem);line-height:.92;text-transform:uppercase;margin-bottom:4rem;transition-delay:.07s;color:var(--dk);">
-        our <span class="text-outline">work.</span>
-      </h2>
-
-      <!-- Portfolio grid -->
-      <div class="reveal" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;transition-delay:.14s;">
-
-        <!-- Card 1 — tall, spans first row -->
-        <div class="work-card" style="min-height:420px;grid-row:span 2;">
-          <!-- Placeholder art -->
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;padding:2rem;">
-            <svg width="100" height="50" viewBox="0 0 100 50" fill="none" aria-hidden="true">
-              <path d="M25 46C14.5 46 6 37.5 6 27C6 16.5 14.5 8 25 8C31.3 8 36.9 11 40.4 15.8"
-                    stroke="rgba(218,237,0,0.15)" stroke-width="7" stroke-linecap="round"/>
-              <path d="M42.8 20.3C43.9 22.5 44.5 24.7 44.5 27C44.5 37.5 36 46 25 46"
-                    stroke="rgba(218,237,0,0.15)" stroke-width="7" stroke-linecap="round"/>
-              <line x1="75" y1="12" x2="75" y2="38" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
-              <line x1="62" y1="25" x2="88" y2="25" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
-              <line x1="65.8" y1="15.8" x2="84.2" y2="34.2" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
-              <line x1="84.2" y1="15.8" x2="65.8" y2="34.2" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
-            </svg>
-            <span style="font-family:var(--font-body);color:rgba(218,237,0,.12);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;">placeholder</span>
-          </div>
-          <div class="work-overlay">
-            <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;">Brand Identity · 2025</span>
-            <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:2rem;line-height:1.1;text-transform:uppercase;">Case Study<br>#01</h3>
-            <span style="font-family:var(--font-body);color:var(--dk);font-weight:700;font-size:.875rem;margin-top:1rem;">view →</span>
-          </div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="work-card" style="min-height:200px;">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-            <span style="font-family:var(--font-display);font-weight:900;font-size:5rem;color:rgba(218,237,0,.08);">O*</span>
-          </div>
-          <div class="work-overlay">
-            <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;">Logo &amp; Branding · 2025</span>
-            <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:2rem;line-height:1.1;text-transform:uppercase;">Case Study<br>#02</h3>
-            <span style="font-family:var(--font-body);color:var(--dk);font-weight:700;font-size:.875rem;margin-top:1rem;">view →</span>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="work-card" style="min-height:200px;">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-            <span style="font-family:var(--font-display);font-weight:900;font-size:5rem;color:rgba(218,237,0,.08);">O*</span>
-          </div>
-          <div class="work-overlay">
-            <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;">Brand Strategy · 2025</span>
-            <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:2rem;line-height:1.1;text-transform:uppercase;">Case Study<br>#03</h3>
-            <span style="font-family:var(--font-body);color:var(--dk);font-weight:700;font-size:.875rem;margin-top:1rem;">view →</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ── CONTACT / CTA ─────────────────── -->
-  <section id="contact" style="position:relative;background:var(--dk);padding:7rem 3rem;overflow:hidden;">
-
-    <!-- Decorative asterisk BG -->
-    <div aria-hidden="true" style="
-      position:absolute; bottom:0; right:0;
-      font-family:var(--font-display); font-weight:900;
-      font-size:clamp(14rem,38vw,55rem);
-      color:var(--y); opacity:.05; line-height:.8;
-      transform:translate(20%,25%);
-      user-select:none; pointer-events:none;">*</div>
-
-    <div style="max-width:1280px;margin:0 auto;position:relative;z-index:1;">
-
-      <!-- Label -->
-      <div class="reveal" style="margin-bottom:3rem;">
-        <span style="font-family:var(--font-body);color:var(--y);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;">ready to get noticed?</span>
-      </div>
-
-      <!-- Headline -->
-      <h2 class="reveal" style="font-family:var(--font-display);font-weight:900;color:#fff;font-size:clamp(3rem,9.5vw,10rem);line-height:.9;text-transform:uppercase;margin-bottom:3.5rem;transition-delay:.08s;">
-        let's make<br>your brand<br><span class="text-y">noticed.</span>
-      </h2>
-
-      <!-- Email CTA -->
-      <div class="reveal" style="transition-delay:.18s;">
-        <a href="mailto:ongaiflow@gmail.com" class="btn-primary"
-           aria-label="Email Ongai Flow at ongaiflow@gmail.com">
-          <svg width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true">
-            <rect x="1" y="1" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M1 4l9 6 9-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-          ongaiflow@gmail.com
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <path d="M3 9h12M11 4l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <a href="services.html" class="reveal" style="font-family:var(--font-body);font-size:.875rem;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:.25rem;transition:color .2s ease;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">
+          All services →
         </a>
       </div>
 
-      <!-- Social links -->
-      <div class="reveal" style="display:flex;align-items:center;gap:1.5rem;margin-top:4rem;transition-delay:.26s;">
-        <a href="#" style="font-family:var(--font-body);color:rgba(255,255,255,.35);font-size:.875rem;transition:color .2s;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Instagram</a>
-        <span style="color:rgba(255,255,255,.2);font-size:.75rem;">·</span>
-        <a href="#" style="font-family:var(--font-body);color:rgba(255,255,255,.35);font-size:.875rem;transition:color .2s;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">LinkedIn</a>
-        <span style="color:rgba(255,255,255,.2);font-size:.75rem;">·</span>
-        <a href="#" style="font-family:var(--font-body);color:rgba(255,255,255,.35);font-size:.875rem;transition:color .2s;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Behance</a>
+      <div id="svc-preview" style="border-top:1px solid rgba(255,255,255,.06);"></div>
+      <script>
+      (function(){
+        const el = document.getElementById('svc-preview');
+        SITE.services.slice(0,4).forEach((s,i) => {
+          el.innerHTML += `
+          <div class="svc-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+              <span class="svc-num">0${i+1}</span>
+              <span class="svc-arrow">→</span>
+            </div>
+            <h3 class="svc-title" style="margin-bottom:.6rem;">${s.title}</h3>
+            <p class="svc-desc">${s.desc}</p>
+          </div>`;
+        });
+      })();
+      </script>
+
+    </div>
+  </section>
+
+
+  <!-- ── WORK PREVIEW ── (white, nav→light) -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:7rem 0 6rem;">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
+
+      <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:5rem;">
+        <div>
+          <span style="font-family:var(--font-body);color:rgba(20,17,5,.3);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;display:block;margin-bottom:1.5rem;">03 — selected work</span>
+          <h2 class="h-section" style="color:var(--dk);">our <span class="text-outline">work.</span></h2>
+        </div>
+        <a href="work.html" class="reveal" style="font-family:var(--font-body);font-size:.875rem;color:rgba(20,17,5,.4);border-bottom:1px solid rgba(20,17,5,.15);padding-bottom:.25rem;transition:color .2s ease;" onmouseover="this.style.color='var(--dk)'" onmouseout="this.style.color='rgba(20,17,5,.4)'">
+          All work →
+        </a>
       </div>
 
+      <div class="reveal" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(20,17,5,.08);transition-delay:.08s;" id="work-preview"></div>
+      <script>
+      (function(){
+        const grid = document.getElementById('work-preview');
+        SITE.work.forEach((w,i) => {
+          const ph = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><svg width="60" height="40" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="rgba(218,237,0,.1)" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/></svg></div>`;
+          const img = w.image ? `<img src="${w.image}" alt="${w.title}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">` : ph;
+          const h = w.tall ? '480px' : '240px';
+          const span = w.tall ? 'grid-row:span 2;' : '';
+          grid.innerHTML += `
+          <a href="${w.link}" class="work-card" style="min-height:${h};display:block;${span}background:var(--dk);">
+            ${img}
+            <div class="work-overlay">
+              <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;">${w.category} · ${w.year}</span>
+              <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:1.6rem;line-height:1.1;text-transform:uppercase;">${w.title}</h3>
+              <span style="font-family:var(--font-body);color:var(--dk);font-weight:600;font-size:.875rem;margin-top:.875rem;">view →</span>
+            </div>
+          </a>`;
+        });
+      })();
+      </script>
+
+    </div>
+  </section>
+
+
+  <!-- ── CONTACT ── (dark, nav→dark) -->
+  <section id="contact" data-nav-theme="dark" style="position:relative;background:var(--dk);padding:8rem 0;overflow:hidden;">
+    <div aria-hidden="true" style="position:absolute;bottom:-10%;right:-4%;font-family:var(--font-display);font-weight:900;font-size:clamp(14rem,35vw,50rem);color:var(--y);opacity:.05;line-height:.8;user-select:none;pointer-events:none;transform:translateY(10%);">*</div>
+
+    <div class="px-site" style="max-width:1320px;margin:0 auto;position:relative;z-index:1;">
+
+      <div style="display:grid;gap:5rem;align-items:start;" id="contact-grid">
+
+        <!-- Left: headline -->
+        <div class="reveal">
+          <span style="font-family:var(--font-body);color:var(--y);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;display:block;margin-bottom:2rem;">ready to get noticed?</span>
+          <h2 class="h-xl" style="color:var(--wh);margin-bottom:2rem;">
+            let's make<br>your brand<br><span class="text-y">noticed.</span>
+          </h2>
+          <p style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.95rem;line-height:1.7;max-width:340px;">Or drop us a direct email at <a href="mailto:ongaiflow@gmail.com" style="color:var(--y);text-decoration:underline;text-underline-offset:3px;">ongaiflow@gmail.com</a></p>
+
+          <div style="display:flex;align-items:center;gap:1.5rem;margin-top:3rem;">
+            <a href="#" id="link-ig"  style="font-family:var(--font-body);color:rgba(255,255,255,.3);font-size:.85rem;transition:color .2s ease;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Instagram</a>
+            <span style="color:rgba(255,255,255,.15);">·</span>
+            <a href="#" id="link-li"  style="font-family:var(--font-body);color:rgba(255,255,255,.3);font-size:.85rem;transition:color .2s ease;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">LinkedIn</a>
+            <span style="color:rgba(255,255,255,.15);">·</span>
+            <a href="#" id="link-bh"  style="font-family:var(--font-body);color:rgba(255,255,255,.3);font-size:.85rem;transition:color .2s ease;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Behance</a>
+          </div>
+        </div>
+
+        <!-- Right: form -->
+        <div class="reveal" style="transition-delay:.1s;">
+          <form id="contact-form" novalidate style="display:flex;flex-direction:column;gap:1.75rem;">
+            <div>
+              <input name="name" type="text" placeholder="Your name" required class="field" autocomplete="name">
+            </div>
+            <div>
+              <input name="email" type="email" placeholder="Your email" required class="field" autocomplete="email">
+            </div>
+            <div>
+              <select name="service" class="field">
+                <option value="" disabled selected>What service do you need?</option>
+                <option>Logo & Branding</option>
+                <option>Brand Strategy</option>
+                <option>Visual Identity</option>
+                <option>Art Direction</option>
+                <option>Brand Guidelines</option>
+                <option>Brand Naming</option>
+                <option>Other / Not sure yet</option>
+              </select>
+            </div>
+            <div>
+              <textarea name="message" placeholder="Tell us about your project…" rows="4" required class="field" style="resize:none;"></textarea>
+            </div>
+            <div>
+              <button type="submit" class="btn-send" id="send-btn">
+                Send message
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </form>
+          <p id="form-msg" class="form-msg" style="display:none;"></p>
+        </div>
+
+      </div>
     </div>
   </section>
 
 </main>
 
 
-<!-- ═══════════════════════════════════
-     FOOTER
-══════════════════════════════════════ -->
-<footer style="background:var(--dk);border-top:1px solid rgba(255,255,255,.07);padding:1.75rem 3rem;">
-  <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;">
-    <span style="font-family:var(--font-body);color:rgba(255,255,255,.22);font-size:.78rem;">© 2025 Ongai Flow. All rights reserved.</span>
-    <div style="display:flex;align-items:center;gap:.5rem;">
-      <span style="font-family:var(--font-body);color:rgba(255,255,255,.18);font-size:.78rem;">branding.</span>
-      <span style="font-family:var(--font-display);font-weight:700;color:var(--y);font-size:.78rem;text-transform:uppercase;">effectively.</span>
+<!-- ═══════ FOOTER ═══════ -->
+<footer style="background:var(--dk);border-top:1px solid rgba(255,255,255,.05);padding:1.75rem 0;">
+  <div class="px-site" style="max-width:1320px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;">
+    <span id="footer-copy" style="font-family:var(--font-body);color:rgba(255,255,255,.2);font-size:.78rem;"></span>
+    <div style="display:flex;align-items:center;gap:.4rem;">
+      <span style="font-family:var(--font-body);color:rgba(255,255,255,.15);font-size:.75rem;">branding.</span>
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--y);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">effectively.</span>
     </div>
   </div>
 </footer>
 
 
-<!-- ═══════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════ -->
+<!-- ═══════ SCRIPTS ═══════ -->
 <script>
 (function () {
-  /* ── Navbar scroll ── */
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', function () {
-    nav.classList.toggle('scrolled', window.scrollY > 60);
-  }, { passive: true });
 
-  /* ── Mobile menu ── */
-  const ham    = document.getElementById('ham');
-  const menu   = document.getElementById('mob-menu');
-  const mobLinks = document.querySelectorAll('.mob-link, #mob-menu a');
-  let isOpen = false;
+  /* ── Wire social links from config ── */
+  document.getElementById('link-ig').href = SITE.social.instagram;
+  document.getElementById('link-li').href = SITE.social.linkedin;
+  document.getElementById('link-bh').href = SITE.social.behance;
+  document.getElementById('footer-copy').textContent = '© ' + SITE.year + ' Ongai Flow. All rights reserved.';
 
-  function toggleMenu(force) {
-    isOpen = (typeof force === 'boolean') ? force : !isOpen;
-    ham.setAttribute('aria-expanded', isOpen);
-    menu.classList.toggle('open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  }
-
-  if (ham) ham.addEventListener('click', function () { toggleMenu(); });
-  mobLinks.forEach(function (link) {
-    link.addEventListener('click', function () { toggleMenu(false); });
+  /* ── Contact grid: 2-col on desktop ── */
+  const cg = document.getElementById('contact-grid');
+  if (window.innerWidth >= 1024) cg.style.gridTemplateColumns = '1fr 1fr';
+  window.addEventListener('resize', function() {
+    cg.style.gridTemplateColumns = window.innerWidth >= 1024 ? '1fr 1fr' : '1fr';
   });
 
-  /* ── Mobile hamburger visibility ── */
-  function updateHamVisibility() {
-    if (ham) ham.style.display = window.innerWidth < 768 ? 'flex' : 'none';
+  /* ── Contact form ── */
+  const form    = document.getElementById('contact-form');
+  const sendBtn = document.getElementById('send-btn');
+  const formMsg = document.getElementById('form-msg');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (SITE.formEndpoint.includes('YOUR_FORM_ID')) {
+      formMsg.textContent = 'Form not configured yet. Please email ongaiflow@gmail.com directly.';
+      formMsg.className = 'form-msg err';
+      formMsg.style.display = 'block';
+      return;
+    }
+    sendBtn.textContent = 'Sending…';
+    sendBtn.disabled = true;
+    try {
+      const res = await fetch(SITE.formEndpoint, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form),
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        formMsg.textContent = "Message sent. We'll be in touch soon.";
+        formMsg.className = 'form-msg ok';
+      } else {
+        throw new Error('failed');
+      }
+    } catch {
+      sendBtn.textContent = 'Send message';
+      sendBtn.disabled = false;
+      formMsg.textContent = 'Something went wrong. Please email us directly.';
+      formMsg.className = 'form-msg err';
+    }
+    formMsg.style.display = 'block';
+  });
+
+  /* ── Navbar: adaptive theme + hide/show ── */
+  const nav = document.getElementById('nav');
+  const themedSections = document.querySelectorAll('[data-nav-theme]');
+  let lastScrollY = 0;
+  let ticking = false;
+  let navHidden = false;
+
+  function getTheme() {
+    const top = window.scrollY + 80;
+    let theme = 'light';
+    themedSections.forEach(function (s) {
+      const st = s.offsetTop, sb = st + s.offsetHeight;
+      if (top >= st && top < sb) theme = s.dataset.navTheme;
+    });
+    return theme;
   }
-  window.addEventListener('resize', updateHamVisibility);
-  updateHamVisibility();
+
+  function updateNav() {
+    const y = window.scrollY;
+    const diff = y - lastScrollY;
+    const theme = getTheme();
+
+    nav.setAttribute('data-theme', theme);
+    nav.classList.remove('scrolled-light', 'scrolled-dark');
+    if (y > 80) nav.classList.add(theme === 'dark' ? 'scrolled-dark' : 'scrolled-light');
+
+    if (y < 100) {
+      nav.style.transform = 'translateY(0)';
+      navHidden = false;
+    } else if (diff > 8 && !navHidden) {
+      nav.style.transform = 'translateY(-100%)';
+      navHidden = true;
+    } else if (diff < -8 && navHidden) {
+      nav.style.transform = 'translateY(0)';
+      navHidden = false;
+    }
+    lastScrollY = y;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function () {
+    if (!ticking) { requestAnimationFrame(updateNav); ticking = true; }
+  }, { passive: true });
+  updateNav();
+
+  /* ── Mobile hamburger ── */
+  const ham = document.getElementById('ham');
+  const mob = document.getElementById('mob-menu');
+  let open = false;
+
+  function setMenu(state) {
+    open = state;
+    ham.setAttribute('aria-expanded', open);
+    mob.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  function resizeHam() {
+    ham.style.display = window.innerWidth < 768 ? 'flex' : 'none';
+  }
+  resizeHam();
+  window.addEventListener('resize', resizeHam);
+
+  if (ham) ham.addEventListener('click', function () { setMenu(!open); });
+  mob.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () { setMenu(false); });
+  });
 
   /* ── Scroll reveal ── */
   const revEls = document.querySelectorAll('.reveal');
-
   if ('IntersectionObserver' in window) {
     const obs = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('in');
-          obs.unobserve(e.target);
-        }
+        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
-
+    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
     revEls.forEach(function (el) { obs.observe(el); });
   } else {
     revEls.forEach(function (el) { el.classList.add('in'); });
   }
 
-  /* Hero elements reveal immediately on load */
+  /* Hero reveals immediately */
   setTimeout(function () {
     document.querySelectorAll('section:first-of-type .reveal').forEach(function (el) {
       el.classList.add('in');
     });
-  }, 80);
+  }, 60);
 
 })();
 </script>
