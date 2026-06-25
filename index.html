@@ -66,13 +66,13 @@
     }
 
     /* Theme: light bg → dark nav text */
-    #nav[data-theme="light"] .nav-wordmark { color: var(--dk); }
+    #nav[data-theme="light"] { border-bottom: 1px solid rgba(20,17,5,.1); }
     #nav[data-theme="light"] .nav-link { color: rgba(20,17,5,.45); }
     #nav[data-theme="light"] .nav-link:hover { color: var(--dk); }
     #nav[data-theme="light"] .ham-line { background: var(--dk); }
 
     /* Theme: dark bg → light nav text */
-    #nav[data-theme="dark"] .nav-wordmark { color: var(--wh); }
+    #nav[data-theme="dark"] { border-bottom: 1px solid transparent; }
     #nav[data-theme="dark"] .nav-link { color: rgba(255,255,255,.45); }
     #nav[data-theme="dark"] .nav-link:hover { color: var(--wh); }
     #nav[data-theme="dark"] .ham-line { background: var(--wh); }
