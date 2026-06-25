@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ongai Flow — We are a business partner that helps your brand get noticed. Branding, effectively.">
+  <title>Ongai Flow. — Branding Agency</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans (body) + Barlow Condensed (display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN (layout utilities only) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ── Brand tokens ── */
+    :root {
+      --y:   #DAED00;   /* electric yellow  */
+      --dk:  #141105;   /* near-black        */
+      --wh:  #FFFFFF;   /* white             */
+      --font-display: 'Barlow Condensed', 'Excon', sans-serif;
+      --font-body:    'Plus Jakarta Sans', 'Satoshi', system-ui, sans-serif;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    a { color: inherit; text-decoration: none; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--dk);
+      color: var(--wh);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Color utilities ── */
+    .bg-y   { background-color: var(--y); }
+    .bg-dk  { background-color: var(--dk); }
+    .bg-wh  { background-color: var(--wh); }
+    .text-y  { color: var(--y); }
+    .text-dk { color: var(--dk); }
+    .text-wh { color: var(--wh); }
+    .border-y { border-color: var(--y); }
+
+    /* ── Typography ── */
+    .font-display { font-family: var(--font-display); }
+    .font-body    { font-family: var(--font-body); }
+
+    /* Fluid hero type */
+    .hero-text {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 9vw, 10rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+
+    .display-xl {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 7vw, 7.5rem);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+    }
+
+    .display-lg {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 5.5rem);
+      font-weight: 900;
+      line-height: 0.94;
+      text-transform: uppercase;
+    }
+
+    /* ── Scroll reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1),
+                  transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ── Navbar ── */
+    #nav { transition: background 0.35s ease, border-color 0.35s ease; }
+    #nav.scrolled {
+      background: var(--dk);
+      border-bottom: 1px solid rgba(218,237,0,0.18);
+    }
+
+    .nav-link {
+      position: relative;
+      font-family: var(--font-body);
+      color: rgba(255,255,255,0.6);
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover { color: #fff; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -2px;
+      width: 0; height: 1px;
+      background: var(--y);
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    .nav-cta {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.875rem;
+      background: var(--y);
+      color: var(--dk);
+      padding: 0.625rem 1.25rem;
+      border-radius: 9999px;
+      transition: background 0.2s ease;
+    }
+    .nav-cta:hover { background: #fff; }
+
+    /* ── Mobile menu ── */
+    #mob-menu {
+      position: fixed; inset: 0; z-index: 40;
+      background: var(--dk);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2.5rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #mob-menu.open { pointer-events: all; opacity: 1; }
+
+    .mob-link {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2.5rem, 10vw, 4rem);
+      text-transform: uppercase;
+      color: #fff;
+      transition: color 0.2s ease;
+    }
+    .mob-link:hover { color: var(--y); }
+
+    /* ── Marquee ── */
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-inner {
+      display: flex;
+      white-space: nowrap;
+      animation: marquee 26s linear infinite;
+    }
+    .marquee-inner:hover { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) { .marquee-inner { animation: none; } }
+
+    /* ── Service cards ── */
+    .svc-card {
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 2.5rem;
+      cursor: pointer;
+      transition: background 0.22s ease, border-color 0.22s ease;
+    }
+    @media (min-width: 768px) { .svc-card { padding: 3rem; } }
+
+    .svc-card:hover {
+      background: var(--y);
+      border-color: var(--y);
+    }
+    .svc-card:hover .svc-num,
+    .svc-card:hover h3,
+    .svc-card:hover p,
+    .svc-card:hover .svc-arrow {
+      color: var(--dk);
+    }
+
+    .svc-num   { color: rgba(255,255,255,0.22); font-size: 0.7rem; letter-spacing: 0.15em; font-family: var(--font-body); }
+    .svc-arrow { color: rgba(255,255,255,0.22); font-size: 1.25rem; transition: transform 0.2s ease; }
+    .svc-card:hover .svc-arrow { transform: translateX(4px); }
+
+    /* ── Portfolio cards ── */
+    .work-card {
+      position: relative;
+      background: var(--dk);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .work-overlay {
+      position: absolute; inset: 0;
+      background: var(--y);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.32s ease;
+    }
+    .work-card:hover .work-overlay { opacity: 1; }
+
+    /* ── Brand mark: italic underlined yellow ── */
+    .brand-mark {
+      font-style: italic;
+      color: var(--y);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 2px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      background: var(--y); color: var(--dk);
+      font-family: var(--font-body); font-weight: 700; font-size: 1rem;
+      padding: 1rem 2rem; border-radius: 9999px;
+      transition: background 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #fff; }
+    .btn-primary svg { transition: transform 0.2s ease; }
+    .btn-primary:hover svg { transform: translateX(4px); }
+
+    /* ── Value items ── */
+    .value-item {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-style: italic;
+      color: var(--dk);
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--y);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Outline text ── */
+    .text-outline {
+      -webkit-text-stroke: 3px var(--dk);
+      color: transparent;
+    }
+
+    /* ── About 2-col grid on desktop ── */
+    @media (min-width: 1024px) {
+      .about-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--dk); }
+    ::-webkit-scrollbar-thumb { background: var(--y); border-radius: 4px; }
+
+    /* ── Hamburger animation ── */
+    .ham-line { display: block; width: 24px; height: 2px; background: #fff; transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease; }
+    #ham[aria-expanded="true"] #hl1 { transform: translateY(7px) rotate(45deg); }
+    #ham[aria-expanded="true"] #hl2 { opacity: 0; }
+    #ham[aria-expanded="true"] #hl3 { transform: translateY(-7px) rotate(-45deg); width: 24px; }
+  </style>
+</head>
+<body>
+
+<!-- Skip nav -->
+<a href="#main" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"
+   onfocus="this.style.cssText='position:fixed;top:1rem;left:1rem;z-index:999;background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;padding:.5rem 1rem;border-radius:9999px;width:auto;height:auto;'"
+   onblur="this.style.cssText='position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;'">
+  Skip to content
+</a>
+
+
+<!-- ═══════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<nav id="nav" style="position:fixed;top:0;left:0;right:0;z-index:50;padding:1.25rem 3rem;"
+     class="flex items-center justify-between">
+
+  <!-- Logo mark -->
+  <a href="/" aria-label="Ongai Flow home" style="display:flex;align-items:center;gap:.75rem;">
+    <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- O-arc: thick stroke with gap at upper-right ~45° -->
+      <path d="M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C15.18 2 17.99 3.52 19.8 5.9"
+            stroke="#DAED00" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M21 9C21.65 10.2 22 11.07 22 12C22 17.523 17.523 22 12 22"
+            stroke="#DAED00" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <!-- Asterisk (8-point geometric) centered at x=36, y=12 -->
+      <line x1="36" y1="4"  x2="36" y2="20" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="28" y1="12" x2="44" y2="12" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="30.3" y1="5.7"  x2="41.7" y2="18.3" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="41.7" y1="5.7"  x2="30.3" y2="18.3" stroke="#DAED00" stroke-width="2.8" stroke-linecap="round"/>
+    </svg>
+    <span style="font-family:var(--font-display);font-weight:900;color:#fff;font-size:1.15rem;letter-spacing:-.01em;text-transform:lowercase;">ongai flow.</span>
+  </a>
+
+  <!-- Desktop links -->
+  <div class="hidden md:flex items-center" style="gap:2rem;">
+    <a href="#work"     class="nav-link">Work</a>
+    <a href="#services" class="nav-link">Services</a>
+    <a href="#about"    class="nav-link">About</a>
+    <a href="mailto:ongaiflow@gmail.com" class="nav-cta" style="margin-left:.5rem;"
+       aria-label="Email Ongai Flow to start a project">Let's talk</a>
+  </div>
+
+  <!-- Hamburger (mobile) -->
+  <button id="ham" aria-label="Open menu" aria-expanded="false" aria-controls="mob-menu"
+          class="md:hidden" style="display:none;flex-direction:column;gap:5px;padding:.5rem;cursor:pointer;background:none;border:none;">
+    <span class="ham-line" id="hl1"></span>
+    <span class="ham-line" id="hl2"></span>
+    <span class="ham-line" id="hl3" style="width:16px;"></span>
+  </button>
+</nav>
+
+<!-- Show hamburger only on mobile via JS (avoids md:hidden fighting display:none) -->
+<script>
+  if (window.innerWidth < 768) {
+    document.getElementById('ham').style.display = 'flex';
+  }
+</script>
+
+<!-- Mobile menu -->
+<div id="mob-menu">
+  <a href="#work"     class="mob-link">Work</a>
+  <a href="#services" class="mob-link">Services</a>
+  <a href="#about"    class="mob-link">About</a>
+  <a href="mailto:ongaiflow@gmail.com"
+     style="background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;font-size:1.1rem;padding:.9rem 2.5rem;border-radius:9999px;margin-top:.5rem;">
+    Let's talk
+  </a>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
+<main id="main">
+
+  <!-- ── HERO ─────────────────────────── -->
+  <section style="position:relative;min-height:100vh;background:var(--dk);display:flex;flex-direction:column;justify-content:center;padding:7rem 3rem 5rem;overflow:hidden;">
+
+    <!-- Decorative large asterisk -->
+    <div aria-hidden="true" style="
+      position:absolute; top:8%; right:-1%;
+      font-family:var(--font-display); font-weight:900;
+      font-size:clamp(14rem,38vw,50rem);
+      color:var(--y); opacity:.06; line-height:1;
+      user-select:none; pointer-events:none;">*</div>
+
+    <!-- Content -->
+    <div style="position:relative;z-index:1;max-width:1400px;">
+
+      <p class="reveal" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:2.5rem;">
+        branding. effectively, not aesthetic.
+      </p>
+
+      <h1 class="hero-text reveal" style="transition-delay:.07s;">
+        we are<br>
+        business<br>
+        partner that<br>
+        help your brand<br>
+        <span class="text-y">noticed.</span>
+      </h1>
+
+      <div class="reveal" style="display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem;margin-top:3rem;transition-delay:.17s;">
+        <a href="mailto:ongaiflow@gmail.com" class="btn-primary"
+           aria-label="Start a project — email ongaiflow@gmail.com">
+          Start a project
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M3 9h12M11 4l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="#work" style="font-family:var(--font-body);color:rgba(255,255,255,.5);font-size:.875rem;display:flex;align-items:center;gap:.5rem;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">
+          See our work <span class="text-y">↓</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Scroll line -->
+    <div class="reveal" style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;transition-delay:.35s;">
+      <div style="width:1px;height:56px;background:linear-gradient(to bottom, transparent, rgba(255,255,255,.2), transparent);"></div>
+      <span style="font-family:var(--font-body);color:rgba(255,255,255,.2);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;">scroll</span>
+    </div>
+  </section>
+
+
+  <!-- ── MARQUEE ────────────────────────── -->
+  <div class="bg-y" style="overflow:hidden;padding:.85rem 0;" aria-hidden="true">
+    <div class="marquee-inner">
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--dk);font-size:.8rem;letter-spacing:.18em;white-space:nowrap;">
+        &nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;
+      </span>
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--dk);font-size:.8rem;letter-spacing:.18em;white-space:nowrap;" aria-hidden="true">
+        &nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;INNOVATIVE&nbsp;·&nbsp;CREATIVE&nbsp;·&nbsp;ADAPTATION&nbsp;·&nbsp;BRANDING EFFECTIVELY&nbsp;·&nbsp;ONGAI FLOW&nbsp;·&nbsp;A SYMBOL SHOULD REPRESENT PERSONALITIES&nbsp;·&nbsp;
+      </span>
+    </div>
+  </div>
+
+
+  <!-- ── ABOUT / PHILOSOPHY ─────────────── -->
+  <section id="about" class="bg-wh text-dk" style="padding:6rem 3rem;">
+    <div style="max-width:1280px;margin:0 auto;">
+
+      <!-- 01 label -->
+      <div class="reveal" style="display:flex;align-items:flex-end;gap:1.25rem;margin-bottom:4rem;">
+        <span style="font-family:var(--font-display);font-weight:900;color:var(--y);font-size:clamp(3.5rem,9vw,6.5rem);line-height:1;">01</span>
+        <span style="font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:.75rem;">who we are</span>
+      </div>
+
+      <!-- Two-col layout -->
+      <div class="about-grid" style="display:grid;gap:4rem;">
+
+        <!-- Left: headline -->
+        <div class="reveal">
+          <h2 class="display-xl text-dk">
+            flowing to<br>the core.
+          </h2>
+        </div>
+
+        <!-- Right: copy + values -->
+        <div class="reveal" style="transition-delay:.13s;">
+          <p style="font-family:var(--font-body);color:rgba(20,17,5,.65);font-size:1.1rem;line-height:1.75;margin-bottom:3rem;">
+            We are a business partner that helps your brand get
+            <span class="brand-mark">noticed.</span> We identify the
+            core problems and give effective solutions — not just pretty
+            visuals. We help you build your brand like it is our own.
+            <span class="brand-mark">We take it serious.</span>
+          </p>
+
+          <!-- Values -->
+          <div style="display:flex;flex-direction:column;gap:.5rem;">
+            <div class="value-item">Innovative</div>
+            <div class="value-item">Creative</div>
+            <div class="value-item">Adaptation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Philosophy quote -->
+      <div class="reveal" style="margin-top:5rem;padding-top:4rem;border-top:1px solid rgba(20,17,5,.1);">
+        <p style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:clamp(1.6rem,4vw,3.5rem);line-height:1.1;">
+          "A Symbol Should Represent<br>
+          <span class="text-y">Personalities"</span>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Yellow stripe -->
+  <div class="bg-y" style="height:5px;width:100%;"></div>
+
+
+  <!-- ── SERVICES ──────────────────────── -->
+  <section id="services" class="bg-dk" style="padding:6rem 3rem;">
+    <div style="max-width:1280px;margin:0 auto;">
+
+      <!-- 02 label -->
+      <div class="reveal" style="margin-bottom:3.5rem;">
+        <span style="font-family:var(--font-body);color:var(--y);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;">02 — services</span>
+      </div>
+
+      <!-- Heading -->
+      <h2 class="display-lg reveal text-wh" style="margin-bottom:4rem;transition-delay:.07s;">
+        what we <span class="text-y">do.</span>
+      </h2>
+
+      <!-- Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));border-top:1px solid rgba(255,255,255,.08);">
+
+        <div class="svc-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
+            <span class="svc-num">01</span>
+            <span class="svc-arrow">→</span>
+          </div>
+          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Logo &amp;<br>Branding</h3>
+          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">A symbol that truly represents your brand personality — not just how good it looks.</p>
+        </div>
+
+        <div class="svc-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
+            <span class="svc-num">02</span>
+            <span class="svc-arrow">→</span>
+          </div>
+          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Brand<br>Strategy</h3>
+          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">We flow to the core — identifying the real brand problem and building the right solution.</p>
+        </div>
+
+        <div class="svc-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
+            <span class="svc-num">03</span>
+            <span class="svc-arrow">→</span>
+          </div>
+          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Visual<br>Identity</h3>
+          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">A complete visual system — color, type, and layout — that says who you are without a word.</p>
+        </div>
+
+        <div class="svc-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
+            <span class="svc-num">04</span>
+            <span class="svc-arrow">→</span>
+          </div>
+          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Art<br>Direction</h3>
+          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">Creative direction that makes every visual asset speak the same brand language.</p>
+        </div>
+
+        <div class="svc-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
+            <span class="svc-num">05</span>
+            <span class="svc-arrow">→</span>
+          </div>
+          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Brand<br>Guidelines</h3>
+          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">Your brand rulebook — so your identity stays consistent at every touchpoint.</p>
+        </div>
+
+        <div class="svc-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;">
+            <span class="svc-num">06</span>
+            <span class="svc-arrow">→</span>
+          </div>
+          <h3 style="font-family:var(--font-display);font-weight:800;color:#fff;font-size:1.5rem;line-height:1.2;margin-bottom:.75rem;">Brand<br>Naming</h3>
+          <p class="svc-desc" style="font-family:var(--font-body);color:rgba(255,255,255,.4);font-size:.875rem;line-height:1.7;transition:color .22s;">A name is the first thing people hear. We help you find one that sticks and means something.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Service card hover — handle child color change via JS since CSS :hover on parent can't cascade to specific descendants reliably without CSS vars -->
+  <script>
+    document.querySelectorAll('.svc-card').forEach(card => {
+      const desc = card.querySelector('.svc-desc');
+      card.addEventListener('mouseenter', () => {
+        if (desc) desc.style.color = 'rgba(20,17,5,.6)';
+      });
+      card.addEventListener('mouseleave', () => {
+        if (desc) desc.style.color = 'rgba(255,255,255,.4)';
+      });
+    });
+  </script>
+
+
+  <!-- ── WORK / PORTFOLIO ──────────────── -->
+  <section id="work" class="bg-wh text-dk" style="padding:6rem 3rem;">
+    <div style="max-width:1280px;margin:0 auto;">
+
+      <!-- Label -->
+      <div class="reveal" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3.5rem;">
+        <span style="font-family:var(--font-body);color:rgba(20,17,5,.35);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;">03 — selected work</span>
+        <span style="font-family:var(--font-body);color:rgba(20,17,5,.3);font-size:.72rem;letter-spacing:.1em;">coming soon</span>
+      </div>
+
+      <!-- Heading with outline effect -->
+      <h2 class="reveal" style="font-family:var(--font-display);font-weight:900;font-size:clamp(2.8rem,8vw,7.5rem);line-height:.92;text-transform:uppercase;margin-bottom:4rem;transition-delay:.07s;color:var(--dk);">
+        our <span class="text-outline">work.</span>
+      </h2>
+
+      <!-- Portfolio grid -->
+      <div class="reveal" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;transition-delay:.14s;">
+
+        <!-- Card 1 — tall, spans first row -->
+        <div class="work-card" style="min-height:420px;grid-row:span 2;">
+          <!-- Placeholder art -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;padding:2rem;">
+            <svg width="100" height="50" viewBox="0 0 100 50" fill="none" aria-hidden="true">
+              <path d="M25 46C14.5 46 6 37.5 6 27C6 16.5 14.5 8 25 8C31.3 8 36.9 11 40.4 15.8"
+                    stroke="rgba(218,237,0,0.15)" stroke-width="7" stroke-linecap="round"/>
+              <path d="M42.8 20.3C43.9 22.5 44.5 24.7 44.5 27C44.5 37.5 36 46 25 46"
+                    stroke="rgba(218,237,0,0.15)" stroke-width="7" stroke-linecap="round"/>
+              <line x1="75" y1="12" x2="75" y2="38" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="62" y1="25" x2="88" y2="25" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="65.8" y1="15.8" x2="84.2" y2="34.2" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="84.2" y1="15.8" x2="65.8" y2="34.2" stroke="rgba(218,237,0,0.15)" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+            <span style="font-family:var(--font-body);color:rgba(218,237,0,.12);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;">placeholder</span>
+          </div>
+          <div class="work-overlay">
+            <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;">Brand Identity · 2025</span>
+            <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:2rem;line-height:1.1;text-transform:uppercase;">Case Study<br>#01</h3>
+            <span style="font-family:var(--font-body);color:var(--dk);font-weight:700;font-size:.875rem;margin-top:1rem;">view →</span>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="work-card" style="min-height:200px;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:var(--font-display);font-weight:900;font-size:5rem;color:rgba(218,237,0,.08);">O*</span>
+          </div>
+          <div class="work-overlay">
+            <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;">Logo &amp; Branding · 2025</span>
+            <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:2rem;line-height:1.1;text-transform:uppercase;">Case Study<br>#02</h3>
+            <span style="font-family:var(--font-body);color:var(--dk);font-weight:700;font-size:.875rem;margin-top:1rem;">view →</span>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="work-card" style="min-height:200px;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:var(--font-display);font-weight:900;font-size:5rem;color:rgba(218,237,0,.08);">O*</span>
+          </div>
+          <div class="work-overlay">
+            <span style="font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;">Brand Strategy · 2025</span>
+            <h3 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:2rem;line-height:1.1;text-transform:uppercase;">Case Study<br>#03</h3>
+            <span style="font-family:var(--font-body);color:var(--dk);font-weight:700;font-size:.875rem;margin-top:1rem;">view →</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ── CONTACT / CTA ─────────────────── -->
+  <section id="contact" style="position:relative;background:var(--dk);padding:7rem 3rem;overflow:hidden;">
+
+    <!-- Decorative asterisk BG -->
+    <div aria-hidden="true" style="
+      position:absolute; bottom:0; right:0;
+      font-family:var(--font-display); font-weight:900;
+      font-size:clamp(14rem,38vw,55rem);
+      color:var(--y); opacity:.05; line-height:.8;
+      transform:translate(20%,25%);
+      user-select:none; pointer-events:none;">*</div>
+
+    <div style="max-width:1280px;margin:0 auto;position:relative;z-index:1;">
+
+      <!-- Label -->
+      <div class="reveal" style="margin-bottom:3rem;">
+        <span style="font-family:var(--font-body);color:var(--y);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;">ready to get noticed?</span>
+      </div>
+
+      <!-- Headline -->
+      <h2 class="reveal" style="font-family:var(--font-display);font-weight:900;color:#fff;font-size:clamp(3rem,9.5vw,10rem);line-height:.9;text-transform:uppercase;margin-bottom:3.5rem;transition-delay:.08s;">
+        let's make<br>your brand<br><span class="text-y">noticed.</span>
+      </h2>
+
+      <!-- Email CTA -->
+      <div class="reveal" style="transition-delay:.18s;">
+        <a href="mailto:ongaiflow@gmail.com" class="btn-primary"
+           aria-label="Email Ongai Flow at ongaiflow@gmail.com">
+          <svg width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M1 4l9 6 9-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          ongaiflow@gmail.com
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M3 9h12M11 4l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Social links -->
+      <div class="reveal" style="display:flex;align-items:center;gap:1.5rem;margin-top:4rem;transition-delay:.26s;">
+        <a href="#" style="font-family:var(--font-body);color:rgba(255,255,255,.35);font-size:.875rem;transition:color .2s;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Instagram</a>
+        <span style="color:rgba(255,255,255,.2);font-size:.75rem;">·</span>
+        <a href="#" style="font-family:var(--font-body);color:rgba(255,255,255,.35);font-size:.875rem;transition:color .2s;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">LinkedIn</a>
+        <span style="color:rgba(255,255,255,.2);font-size:.75rem;">·</span>
+        <a href="#" style="font-family:var(--font-body);color:rgba(255,255,255,.35);font-size:.875rem;transition:color .2s;" onmouseover="this.style.color='var(--y)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Behance</a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+
+<!-- ═══════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer style="background:var(--dk);border-top:1px solid rgba(255,255,255,.07);padding:1.75rem 3rem;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;">
+    <span style="font-family:var(--font-body);color:rgba(255,255,255,.22);font-size:.78rem;">© 2025 Ongai Flow. All rights reserved.</span>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <span style="font-family:var(--font-body);color:rgba(255,255,255,.18);font-size:.78rem;">branding.</span>
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--y);font-size:.78rem;text-transform:uppercase;">effectively.</span>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+(function () {
+  /* ── Navbar scroll ── */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', function () {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  /* ── Mobile menu ── */
+  const ham    = document.getElementById('ham');
+  const menu   = document.getElementById('mob-menu');
+  const mobLinks = document.querySelectorAll('.mob-link, #mob-menu a');
+  let isOpen = false;
+
+  function toggleMenu(force) {
+    isOpen = (typeof force === 'boolean') ? force : !isOpen;
+    ham.setAttribute('aria-expanded', isOpen);
+    menu.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  if (ham) ham.addEventListener('click', function () { toggleMenu(); });
+  mobLinks.forEach(function (link) {
+    link.addEventListener('click', function () { toggleMenu(false); });
+  });
+
+  /* ── Mobile hamburger visibility ── */
+  function updateHamVisibility() {
+    if (ham) ham.style.display = window.innerWidth < 768 ? 'flex' : 'none';
+  }
+  window.addEventListener('resize', updateHamVisibility);
+  updateHamVisibility();
+
+  /* ── Scroll reveal ── */
+  const revEls = document.querySelectorAll('.reveal');
+
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+
+    revEls.forEach(function (el) { obs.observe(el); });
+  } else {
+    revEls.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* Hero elements reveal immediately on load */
+  setTimeout(function () {
+    document.querySelectorAll('section:first-of-type .reveal').forEach(function (el) {
+      el.classList.add('in');
+    });
+  }, 80);
+
+})();
+</script>
+
+</body>
+</html>
