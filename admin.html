@@ -119,8 +119,8 @@
     .toggle input:checked ~ .toggle-thumb{transform:translateX(18px);}
 
     /* Toast — transition added via JS after first paint to prevent FOUC */
-    #toast{position:fixed;bottom:2rem;right:2rem;background:var(--y);color:var(--dk);font-weight:700;font-size:.85rem;padding:.75rem 1.5rem;border-radius:8px;transform:translateY(120%);z-index:99;pointer-events:none;}
-    #toast.show{transform:translateY(0);}
+    #toast{position:fixed;bottom:2rem;right:2rem;background:var(--y);color:var(--dk);font-weight:700;font-size:.85rem;padding:.75rem 1.5rem;border-radius:8px;max-width:320px;line-height:1.4;transform:translateY(calc(100% + 3rem));opacity:0;z-index:9999;pointer-events:none;}
+    #toast.show{transform:translateY(0);opacity:1;}
 
     /* Divider */
     .divider{height:1px;background:rgba(255,255,255,.06);margin:2rem 0;}
@@ -482,7 +482,11 @@ function getData() {
 }
 
 function saveData(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  } catch(e) {
+    throw new Error('Storage full — images are too large. Use external URLs or smaller files.');
+  }
 }
 
 /* ── Load all forms ── */
@@ -572,17 +576,18 @@ function saveAll() {
     saveData(d);
     showToast('Changes saved!');
   } catch(err) {
-    showToast('Save failed: ' + err.message);
+    showToast(err.message, 5000);
     console.error('saveAll error:', err);
   }
 }
 
 /* ── Toast ── */
-function showToast(msg) {
+function showToast(msg, duration) {
   const t = document.getElementById('toast');
   t.textContent = msg;
+  clearTimeout(t._hideTimer);
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  t._hideTimer = setTimeout(() => t.classList.remove('show'), duration || 2500);
 }
 
 /* ══════════════════════════════
@@ -641,14 +646,11 @@ function collectClients() {
   });
 }
 
-function handleClientLogo(input, i) {
+async function handleClientLogo(input, i) {
   if (!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const prev = document.getElementById(`cl-prev-${i}`);
-    prev.innerHTML = `<img src="${e.target.result}">`;
-  };
-  reader.readAsDataURL(input.files[0]);
+  const dataURL = await compressImage(input.files[0], 300, 150, 0.8);
+  const prev = document.getElementById(`cl-prev-${i}`);
+  prev.innerHTML = `<img src="${dataURL}">`;
 }
 
 /* ══════════════════════════════
@@ -780,15 +782,12 @@ function collectWork() {
   }));
 }
 
-function handleWorkImg(input, i) {
+async function handleWorkImg(input, i) {
   if (!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const prev = document.getElementById(`w-prev-${i}`);
-    prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-    document.getElementById(`w-img-${i}`).value = e.target.result;
-  };
-  reader.readAsDataURL(input.files[0]);
+  const dataURL = await compressImage(input.files[0], 1200, 800, 0.75);
+  const prev = document.getElementById(`w-prev-${i}`);
+  prev.innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;">`;
+  document.getElementById(`w-img-${i}`).value = dataURL;
 }
 
 function updateWorkImgPreview(input, i) {
@@ -887,26 +886,46 @@ function collectTeam() {
   });
 }
 
-function handleTeamMemberPhoto(input, i) {
+async function handleTeamMemberPhoto(input, i) {
   if (!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const prev = document.getElementById(`tm-prev-${i}`);
-    prev.innerHTML = `<img src="${e.target.result}">`;
-  };
-  reader.readAsDataURL(input.files[0]);
+  const dataURL = await compressImage(input.files[0], 400, 400, 0.8);
+  const prev = document.getElementById(`tm-prev-${i}`);
+  prev.innerHTML = `<img src="${dataURL}">`;
+}
+
+/* ══════════════════════════════
+   IMAGE COMPRESSION UTILITY
+══════════════════════════════ */
+function compressImage(file, maxW, maxH, quality) {
+  return new Promise(function(resolve) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        let w = img.width, h = img.height;
+        if (w > maxW || h > maxH) {
+          const ratio = Math.min(maxW / w, maxH / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 /* ══════════════════════════════
    LOGO
 ══════════════════════════════ */
-function handleLogoUpload(input) {
+async function handleLogoUpload(input) {
   if (!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('logo-preview').innerHTML = `<img src="${e.target.result}">`;
-  };
-  reader.readAsDataURL(input.files[0]);
+  const dataURL = await compressImage(input.files[0], 400, 200, 0.85);
+  document.getElementById('logo-preview').innerHTML = `<img src="${dataURL}">`;
 }
 
 function clearLogo() {
@@ -916,13 +935,10 @@ function clearLogo() {
 /* ══════════════════════════════
    TEAM PHOTO
 ══════════════════════════════ */
-function handleTeamPhotoUpload(input) {
+async function handleTeamPhotoUpload(input) {
   if (!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('team-photo-preview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-  };
-  reader.readAsDataURL(input.files[0]);
+  const dataURL = await compressImage(input.files[0], 1200, 800, 0.75);
+  document.getElementById('team-photo-preview').innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;">`;
 }
 
 function clearTeamPhoto() {
@@ -1053,9 +1069,9 @@ try {
 /* ── Utility ── */
 function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
-/* Enable toast slide transition only after initial paint — prevents FOUC on page load */
+/* Enable toast transitions only after initial paint — prevents FOUC on page load */
 requestAnimationFrame(function(){ requestAnimationFrame(function(){
-  document.getElementById('toast').style.transition = 'transform .35s cubic-bezier(.22,1,.36,1)';
+  document.getElementById('toast').style.transition = 'transform .35s cubic-bezier(.22,1,.36,1), opacity .35s ease';
 }); });
 </script>
 </body>
