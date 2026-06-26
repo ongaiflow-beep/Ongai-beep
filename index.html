@@ -244,6 +244,18 @@
 
     /* Mobile padding */
     .px-site { padding-left: clamp(1.5rem, 5vw, 4rem); padding-right: clamp(1.5rem, 5vw, 4rem); }
+
+    /* ── Morph Hero ── */
+    #mh { position:relative; height:100vh; overflow:hidden; background:var(--dk); }
+    #mh-wrap { position:absolute; inset:0; overflow:hidden; }
+    .mc { position:absolute; left:50%; top:50%; margin-left:-30px; margin-top:-42.5px; width:60px; height:85px; cursor:pointer; transform-style:preserve-3d; will-change:transform; }
+    .mc-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.34,1.56,.64,1); }
+    .mc:hover .mc-inner { transform:rotateY(180deg); }
+    .mc-f, .mc-b { position:absolute; inset:0; border-radius:10px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+    .mc-f img { width:100%; height:100%; object-fit:cover; display:block; }
+    .mc-f::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.2); transition:opacity .2s; }
+    .mc:hover .mc-f::after { opacity:0; }
+    .mc-b { transform:rotateY(180deg); background:#1a1803; border:1px solid rgba(218,237,0,.25); display:flex; align-items:center; justify-content:center; }
   </style>
 </head>
 <body>
@@ -257,7 +269,7 @@
 
 
 <!-- ═══════ NAVBAR ═══════ -->
-<nav id="nav" data-theme="light" aria-label="Main navigation">
+<nav id="nav" data-theme="dark" aria-label="Main navigation">
   <a href="index.html" style="display:flex;align-items:center;gap:.7rem;" aria-label="Ongai Flow home">
     <!-- Logo mark: circle O + 6-point asterisk -->
     <svg id="logo-mark" width="42" height="28" viewBox="0 0 42 28" fill="none" aria-hidden="true">
@@ -299,6 +311,208 @@
 
 <!-- ═══════ MAIN ═══════ -->
 <main id="main">
+
+  <!-- ── MORPH INTRO ── (dark, nav→dark) -->
+  <section id="mh" data-nav-theme="dark">
+    <div id="mh-wrap" aria-hidden="true"></div>
+
+    <div id="mh-intro" style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:2rem;">
+      <p style="font-family:var(--font-body);color:rgba(255,255,255,.28);font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;margin-bottom:2rem;">branding. effectively, not aesthetic.</p>
+      <h1 class="h-hero" style="color:var(--wh);max-width:820px;">we make your brand <span style="color:var(--y);">noticed.</span></h1>
+      <p style="font-family:var(--font-body);color:rgba(255,255,255,.2);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-top:2.5rem;">scroll to explore</p>
+    </div>
+
+    <div id="mh-arc" style="position:absolute;top:8%;left:0;right:0;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none;padding:2rem;opacity:0;">
+      <p style="font-family:var(--font-body);color:var(--y);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.25rem;">selected work</p>
+      <h2 class="h-section" style="color:var(--wh);">our <span style="color:var(--y);">work.</span></h2>
+    </div>
+
+    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;">
+      <div style="width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.2));"></div>
+      <span style="font-family:var(--font-body);color:rgba(255,255,255,.18);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;">scroll</span>
+    </div>
+
+    <button id="mh-skip" style="position:absolute;bottom:2rem;right:2rem;z-index:20;font-family:var(--font-body);font-size:.7rem;color:rgba(255,255,255,.3);background:none;border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:.4rem 1rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,.35)'" onmouseout="this.style.color='rgba(255,255,255,.3)';this.style.borderColor='rgba(255,255,255,.12)'">Skip →</button>
+  </section>
+
+  <script>
+  (function(){
+    var N=20, W=60, H=85, MAX=1500;
+    var IMGS=[
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=300&q=80',
+      'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=300&q=80',
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&q=80',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&q=80',
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=300&q=80',
+      'https://images.unsplash.com/photo-1506765515384-028b60a970df?w=300&q=80',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&q=80',
+      'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=300&q=80',
+      'https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?w=300&q=80',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=300&q=80',
+      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80',
+      'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=300&q=80',
+      'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300&q=80',
+      'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=300&q=80',
+      'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=300&q=80',
+      'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=300&q=80',
+      'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=300&q=80',
+      'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=300&q=80',
+      'https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?w=300&q=80',
+      'https://images.unsplash.com/photo-1496568816309-51d7c20e3b21?w=300&q=80'
+    ];
+    // Prepend any SITE work images
+    if(typeof SITE!=='undefined'&&SITE.work){
+      var si=SITE.work.filter(function(w){return w.image;}).map(function(w){return w.image;});
+      IMGS=si.concat(IMGS).slice(0,N);
+    }
+    while(IMGS.length<N) IMGS.push(IMGS[IMGS.length%10]);
+
+    var sec=document.getElementById('mh'),wrap=document.getElementById('mh-wrap');
+    var introEl=document.getElementById('mh-intro'),arcEl=document.getElementById('mh-arc');
+    var skipBtn=document.getElementById('mh-skip');
+    var cw=0,ch=0,phase='scatter',virScr=0,capScr=false;
+
+    /* Spring: {x,v,t,k,b} */
+    var mSpr={x:0,v:0,t:0,k:40,b:20}; /* morph */
+    var rSpr={x:0,v:0,t:0,k:40,b:20}; /* rotation */
+    var pSpr={x:0,v:0,t:0,k:30,b:20}; /* parallax */
+    function stepSpr(s,dt){var a=(s.t-s.x)*s.k-s.v*s.b;s.v+=a*dt;s.x+=s.v*dt;}
+
+    /* Stable scatter positions */
+    var scatter=IMGS.map(function(){
+      return{x:(Math.random()-.5)*1400,y:(Math.random()-.5)*700,r:(Math.random()-.5)*180,s:.5,o:0};
+    });
+
+    /* Per-card spring state */
+    var K=40,B=15;
+    var ST=scatter.map(function(sp){
+      return{x:sp.x,vx:0,y:sp.y,vy:0,r:sp.r,vr:0,s:.5,vs:0,o:0,vo:0};
+    });
+    var cards=[];
+
+    function mkCards(){
+      IMGS.slice(0,N).forEach(function(src,i){
+        var c=document.createElement('div'); c.className='mc';
+        var inn=document.createElement('div'); inn.className='mc-inner';
+        var f=document.createElement('div'); f.className='mc-f';
+        var img=document.createElement('img'); img.src=src; img.alt=''; img.loading='lazy';
+        f.appendChild(img);
+        var b=document.createElement('div'); b.className='mc-b';
+        b.innerHTML='<span style="font-family:var(--font-body);font-size:.65rem;font-weight:700;color:var(--y);letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:2;">View<br>Project</span>';
+        inn.appendChild(f); inn.appendChild(b); c.appendChild(inn); wrap.appendChild(c);
+        c.style.transform='translate('+scatter[i].x+'px,'+scatter[i].y+'px) rotate('+scatter[i].r+'deg) scale(.5)';
+        c.style.opacity='0';
+        cards.push(c);
+      });
+    }
+
+    function lerp(a,b,t){return a*(1-t)+b*t;}
+
+    function getTarget(i){
+      var M=mSpr.x,R=rSpr.x,P=pSpr.x;
+      if(phase==='scatter') return scatter[i];
+      if(phase==='line'){
+        var sp=70,tw=N*sp;
+        return{x:i*sp-tw/2,y:0,r:0,s:1,o:1};
+      }
+      /* circle → arc */
+      var isMob=cw<768,minD=Math.min(cw,ch);
+      /* Circle */
+      var cr=Math.min(minD*.35,350),ca=(i/N)*360;
+      var cRad=ca*Math.PI/180;
+      var cx=Math.cos(cRad)*cr, cy2=Math.sin(cRad)*cr, cr2=ca+90;
+      /* Arc */
+      var base=Math.min(cw,ch*1.5),ar=base*(isMob?1.4:1.1);
+      var aApex=ch*(isMob?.35:.25),aCY=aApex+ar;
+      var spread=isMob?100:130,startA=-90-spread/2,stepA=spread/(N-1);
+      var scrP=Math.min(Math.max(R/360,0),1),arcA=startA+i*stepA+(-scrP*spread*.8);
+      var arcRad=arcA*Math.PI/180,as=isMob?1.4:1.8;
+      return{
+        x:lerp(cx, Math.cos(arcRad)*ar+P, M),
+        y:lerp(cy2, Math.sin(arcRad)*ar+aCY, M),
+        r:lerp(cr2, arcA+90, M),
+        s:lerp(1,as,M), o:1
+      };
+    }
+
+    var lastT=0;
+    function loop(t){
+      requestAnimationFrame(loop);
+      var dt=Math.min((t-lastT)/1000,.05); lastT=t;
+      stepSpr(mSpr,dt); stepSpr(rSpr,dt); stepSpr(pSpr,dt);
+      for(var i=0;i<N;i++){
+        var s=ST[i],tg=getTarget(i);
+        var ax=(tg.x-s.x)*K-s.vx*B; s.vx+=ax*dt; s.x+=s.vx*dt;
+        var ay=(tg.y-s.y)*K-s.vy*B; s.vy+=ay*dt; s.y+=s.vy*dt;
+        var ar=(tg.r-s.r)*K-s.vr*B; s.vr+=ar*dt; s.r+=s.vr*dt;
+        var as=(tg.s-s.s)*K-s.vs*B; s.vs+=as*dt; s.s+=s.vs*dt;
+        var ao=(tg.o-s.o)*K-s.vo*B; s.vo+=ao*dt; s.o+=s.vo*dt;
+        cards[i].style.transform='translate('+s.x.toFixed(1)+'px,'+s.y.toFixed(1)+'px) rotate('+s.r.toFixed(1)+'deg) scale('+Math.max(0,s.s).toFixed(3)+')';
+        cards[i].style.opacity=Math.min(1,Math.max(0,s.o)).toFixed(3);
+      }
+      var M=mSpr.x;
+      if(introEl) introEl.style.opacity=(phase==='circle'?Math.max(0,1-M*2):1).toFixed(3);
+      if(arcEl)   arcEl.style.opacity=Math.max(0,(M-.8)*5).toFixed(3);
+    }
+
+    function updTgts(){
+      mSpr.t=Math.min(virScr/600,1);
+      rSpr.t=virScr>600?(virScr-600)/(MAX-600)*360:0;
+    }
+
+    function onWheel(e){
+      if(!capScr) return;
+      var rect=sec.getBoundingClientRect();
+      if(rect.top>10||rect.top<-60) return;
+      var nv=Math.min(Math.max(virScr+e.deltaY,0),MAX);
+      if(nv===virScr) return;
+      if(virScr>=MAX&&e.deltaY>0) return;
+      if(virScr<=0&&e.deltaY<0) return;
+      e.preventDefault(); virScr=nv; updTgts();
+    }
+
+    var ty0=0;
+    function onTS(e){if(capScr) ty0=e.touches[0].clientY;}
+    function onTM(e){
+      if(!capScr) return;
+      var rect=sec.getBoundingClientRect();
+      if(rect.top>10||rect.top<-60) return;
+      var dy=ty0-e.touches[0].clientY; ty0=e.touches[0].clientY;
+      var nv=Math.min(Math.max(virScr+dy,0),MAX);
+      if(nv===virScr) return;
+      if(virScr>=MAX&&dy>0) return;
+      if(virScr<=0&&dy<0) return;
+      e.preventDefault(); virScr=nv; updTgts();
+    }
+
+    function onMM(e){
+      var rect=sec.getBoundingClientRect();
+      if(rect.bottom<0||rect.top>window.innerHeight) return;
+      pSpr.t=((e.clientX-rect.left)/rect.width*2-1)*100;
+    }
+
+    function updSz(){cw=sec.offsetWidth;ch=sec.offsetHeight;}
+
+    function skipAnim(){
+      virScr=MAX; updTgts(); capScr=false;
+      if(skipBtn) skipBtn.style.display='none';
+      var nx=sec.nextElementSibling;
+      if(nx) nx.scrollIntoView({behavior:'smooth'});
+    }
+
+    updSz(); mkCards();
+    if(skipBtn) skipBtn.addEventListener('click',skipAnim);
+    setTimeout(function(){phase='line';},500);
+    setTimeout(function(){phase='circle';capScr=true;},2500);
+    requestAnimationFrame(function(t){lastT=t;requestAnimationFrame(loop);});
+    window.addEventListener('wheel',onWheel,{passive:false});
+    window.addEventListener('touchstart',onTS,{passive:true});
+    window.addEventListener('touchmove',onTM,{passive:false});
+    document.addEventListener('mousemove',onMM);
+    window.addEventListener('resize',updSz);
+  })();
+  </script>
+
 
   <!-- ── HERO ── (white, nav→light) -->
   <section data-nav-theme="light" style="position:relative;min-height:100vh;background:var(--wh);display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
