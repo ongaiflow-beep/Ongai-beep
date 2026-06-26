@@ -50,7 +50,7 @@
     .mob-link:hover{color:var(--y);}
 
     /* Work cards */
-    .work-card{position:relative;overflow:hidden;cursor:pointer;background:#0e0d04;}
+    .work-card{position:relative;overflow:hidden;cursor:pointer;background:#0e0d04;border-radius:28px;}
     .work-overlay{position:absolute;inset:0;background:var(--y);display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;opacity:0;transition:opacity .3s ease;}
     .work-card:hover .work-overlay{opacity:1;}
 
@@ -137,9 +137,9 @@
           const h = heights[i] || '300px';
           const span = w.tall ? 'grid-row:span 2;' : '';
           grid.innerHTML += `
-          <a href="${w.link}" class="work-card" style="min-height:${h};display:block;${span}border-radius:8px;">
+          <a href="${w.link}" class="work-card" style="min-height:${h};display:block;${span}border-radius:28px;">
             ${img}
-            <div class="work-overlay" style="border-radius:8px;">
+            <div class="work-overlay" style="border-radius:28px;">
               <span style="font-family:var(--font-body);color:rgba(20,17,5,.55);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;">${w.category} · ${w.year}</span>
               <h2 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:1.8rem;line-height:1.1;">${w.title}</h2>
               <span style="font-family:var(--font-body);color:var(--dk);font-weight:600;font-size:.875rem;margin-top:.875rem;">view →</span>
