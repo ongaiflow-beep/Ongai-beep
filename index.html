@@ -507,13 +507,13 @@
   <!-- ── CLIENTS ── (white, nav→light) -->
   <section data-nav-theme="light" style="background:var(--wh);padding:2rem 0;border-top:1px solid rgba(20,17,5,.06);border-bottom:1px solid rgba(20,17,5,.06);">
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
-      <div id="clients-row" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:3.5rem;"></div>
+      <div id="clients-row" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:2rem;row-gap:1.5rem;"></div>
     </div>
   </section>
   <script>
   (function(){
     const row = document.getElementById('clients-row');
-    SITE.clients.forEach(function(c) {
+    SITE.clients.slice(0, 10).forEach(function(c) {
       if (c.image) {
         row.innerHTML += '<img src="'+c.image+'" alt="'+c.name+'" class="client-img">';
       } else {
