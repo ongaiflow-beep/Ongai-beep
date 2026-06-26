@@ -290,8 +290,14 @@
     html += '</div></section>';
   }
 
-  /* PDF CASE STUDY */
+  /* CASE STUDY LINK — PDF gets iframe embed; web URLs (Behance etc.) get a button */
   if (w.pdfUrl && w.pdfUrl.trim()) {
+    var csUrl   = w.pdfUrl.trim();
+    var isPdf   = /\.pdf(\?.*)?$/i.test(csUrl);
+    var btnLabel = isPdf ? 'View PDF' : 'View Case Study';
+    var externalIcon = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var btnStyle = 'display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-body);font-weight:600;font-size:.875rem;background:var(--y);color:var(--dk);padding:.6rem 1.4rem;border-radius:9999px;transition:background .2s,color .2s;';
+
     html += '<section data-nav-theme="light" style="background:var(--wh);padding:5rem 0 7rem;">';
     html += '<div class="px-site" style="max-width:1320px;margin:0 auto;">';
     html += '<div class="reveal" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1.25rem;margin-bottom:2.5rem;">';
@@ -300,11 +306,16 @@
     html += '<h2 class="h-section" style="color:var(--dk);">Full Case Study</h2>';
     html += '</div>';
     html += '<div style="display:flex;gap:.75rem;flex-wrap:wrap;">';
-    html += '<a href="' + h(w.pdfUrl) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-body);font-weight:600;font-size:.875rem;background:var(--y);color:var(--dk);padding:.6rem 1.4rem;border-radius:9999px;transition:background .2s,color .2s;" onmouseover="this.style.background=\'var(--dk)\';this.style.color=\'var(--wh)\'" onmouseout="this.style.background=\'var(--y)\';this.style.color=\'var(--dk)\'">View PDF <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>';
-    html += '<a href="' + h(w.pdfUrl) + '" download style="display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-body);font-weight:600;font-size:.875rem;background:transparent;color:var(--dk);border:1.5px solid rgba(20,17,5,.18);padding:.6rem 1.4rem;border-radius:9999px;transition:border-color .2s;" onmouseover="this.style.borderColor=\'var(--dk)\'" onmouseout="this.style.borderColor=\'rgba(20,17,5,.18)\'">↓ Download</a>';
+    html += '<a href="' + h(csUrl) + '" target="_blank" rel="noopener" style="' + btnStyle + '" onmouseover="this.style.background=\'var(--dk)\';this.style.color=\'var(--wh)\'" onmouseout="this.style.background=\'var(--y)\';this.style.color=\'var(--dk)\'">' + btnLabel + ' ' + externalIcon + '</a>';
+    if (isPdf) {
+      html += '<a href="' + h(csUrl) + '" download style="display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-body);font-weight:600;font-size:.875rem;background:transparent;color:var(--dk);border:1.5px solid rgba(20,17,5,.18);padding:.6rem 1.4rem;border-radius:9999px;transition:border-color .2s;" onmouseover="this.style.borderColor=\'var(--dk)\'" onmouseout="this.style.borderColor=\'rgba(20,17,5,.18)\'">↓ Download</a>';
+    }
     html += '</div>';
     html += '</div>';
-    html += '<div class="reveal"><iframe src="' + h(w.pdfUrl) + '" class="pdf-frame" title="' + h(w.title) + ' Case Study PDF"></iframe></div>';
+    /* Embed iframe only for PDFs — web platforms (Behance, Dribbble, etc.) block iframe embedding */
+    if (isPdf) {
+      html += '<div class="reveal"><iframe src="' + h(csUrl) + '" class="pdf-frame" title="' + h(w.title) + ' Case Study"></iframe></div>';
+    }
     html += '</div></section>';
   }
 
