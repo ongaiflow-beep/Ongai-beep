@@ -446,7 +446,7 @@
 
     var scrLocked=false;
     function acquireScrLock(){document.body.style.overflow='hidden';scrLocked=true;}
-    function releaseScrLock(){document.body.style.overflow='';scrLocked=false;}
+    function releaseScrLock(){document.body.style.overflow='';scrLocked=false;window.dispatchEvent(new Event('scroll'));}
 
     function onWheel(e){
       if(!capScr) return;
