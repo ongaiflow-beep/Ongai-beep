@@ -404,7 +404,7 @@
         <div class="divider"></div>
         <p class="section-title">Publish to GitHub</p>
         <div class="cred-info">
-          Enter a GitHub <strong>Personal Access Token</strong> (with <code style="background:rgba(0,0,0,.06);padding:.1em .4em;border-radius:4px;font-size:.88em;">repo</code> scope) so the <strong>Publish live</strong> button can push <code style="background:rgba(0,0,0,.06);padding:.1em .4em;border-radius:4px;font-size:.88em;">config.js</code> directly to your repo — making all saved changes visible to everyone instantly.
+          Enter a GitHub <strong>Personal Access Token</strong> (with <code style="background:rgba(0,0,0,.06);padding:.1em .4em;border-radius:4px;font-size:.88em;">repo</code> scope). Clicking <strong>Publish live</strong> syncs all site files to the deployment branch so everyone sees your latest changes.
         </div>
         <div class="form-group">
           <label class="form-label">GitHub Personal Access Token</label>
@@ -419,8 +419,14 @@
             <label class="form-label">Repository</label>
             <input id="gh-repo" class="form-input" value="Ongai-beep" oninput="saveGhConfig()">
           </div>
-          <div class="form-group" style="flex:0 0 120px">
-            <label class="form-label">Branch</label>
+        </div>
+        <div style="display:flex;gap:1rem;">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Source branch <span style="font-weight:400;opacity:.55;">(where code lives)</span></label>
+            <input id="gh-src-branch" class="form-input" value="claude/jolly-curie-rogsjn" oninput="saveGhConfig()">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Deploy branch <span style="font-weight:400;opacity:.55;">(live site)</span></label>
             <input id="gh-branch" class="form-input" value="cloudflare/workers-autoconfig" oninput="saveGhConfig()">
           </div>
         </div>
@@ -1255,29 +1261,45 @@ const GH_KEY = 'ongai_gh_config';
 function loadGhConfig() {
   try {
     const c = JSON.parse(localStorage.getItem(GH_KEY) || '{}');
-    document.getElementById('gh-token').value  = c.token  || '';
-    document.getElementById('gh-owner').value  = c.owner  || 'ongaiflow-beep';
-    document.getElementById('gh-repo').value   = c.repo   || 'Ongai-beep';
-    document.getElementById('gh-branch').value = c.branch || 'cloudflare/workers-autoconfig';
+    document.getElementById('gh-token').value      = c.token     || '';
+    document.getElementById('gh-owner').value      = c.owner     || 'ongaiflow-beep';
+    document.getElementById('gh-repo').value       = c.repo      || 'Ongai-beep';
+    document.getElementById('gh-src-branch').value = c.srcBranch || 'claude/jolly-curie-rogsjn';
+    document.getElementById('gh-branch').value     = c.branch    || 'cloudflare/workers-autoconfig';
   } catch(e) {}
 }
 function saveGhConfig() {
   localStorage.setItem(GH_KEY, JSON.stringify({
-    token:  document.getElementById('gh-token').value.trim(),
-    owner:  document.getElementById('gh-owner').value.trim(),
-    repo:   document.getElementById('gh-repo').value.trim(),
-    branch: document.getElementById('gh-branch').value.trim(),
+    token:     document.getElementById('gh-token').value.trim(),
+    owner:     document.getElementById('gh-owner').value.trim(),
+    repo:      document.getElementById('gh-repo').value.trim(),
+    srcBranch: document.getElementById('gh-src-branch').value.trim(),
+    branch:    document.getElementById('gh-branch').value.trim(),
   }));
+}
+
+async function pushFile(owner, repo, filename, b64content, destBranch, headers) {
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
+  const destRes = await fetch(`${url}?ref=${encodeURIComponent(destBranch)}`, { headers });
+  const sha = destRes.ok ? (await destRes.json()).sha : undefined;
+  const body = { message: `Sync ${filename}`, content: b64content, branch: destBranch };
+  if (sha) body.sha = sha;
+  const putRes = await fetch(url, { method: 'PUT', headers, body: JSON.stringify(body) });
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    throw new Error(`${filename}: ${err.message || putRes.status}`);
+  }
 }
 
 async function publishToGitHub() {
   saveAll();
-  const c      = JSON.parse(localStorage.getItem(GH_KEY) || '{}');
-  const token  = c.token  || '';
-  const owner  = c.owner  || 'ongaiflow-beep';
-  const repo   = c.repo   || 'Ongai-beep';
-  const branch = c.branch || 'cloudflare/workers-autoconfig';
-  const ghMsg  = document.getElementById('gh-msg');
+  const c         = JSON.parse(localStorage.getItem(GH_KEY) || '{}');
+  const token     = c.token     || '';
+  const owner     = c.owner     || 'ongaiflow-beep';
+  const repo      = c.repo      || 'Ongai-beep';
+  const srcBranch = c.srcBranch || 'claude/jolly-curie-rogsjn';
+  const destBranch= c.branch    || 'cloudflare/workers-autoconfig';
+  const ghMsg     = document.getElementById('gh-msg');
 
   if (!token) {
     showTab('security');
@@ -1296,27 +1318,29 @@ async function publishToGitHub() {
     ghMsg.style.display = 'block';
   };
 
+  const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+  const HTML_FILES = ['index.html', 'admin.html', 'project.html', 'work.html'];
+
   try {
-    const content = generateConfigContent();
-    const encoded = btoa(unescape(encodeURIComponent(content)));
-    const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
-    const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/config.js`;
-
-    const getRes = await fetch(`${apiBase}?ref=${branch}`, { headers });
-    if (!getRes.ok) throw new Error(`Could not read file (${getRes.status}). Check owner/repo/branch.`);
-    const { sha } = await getRes.json();
-
-    const putRes = await fetch(apiBase, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({ message: 'Update site content via admin panel', content: encoded, sha, branch }),
-    });
-    if (!putRes.ok) {
-      const body = await putRes.json().catch(() => ({}));
-      throw new Error(body.message || `GitHub error ${putRes.status}`);
+    /* 1 — Sync HTML files from source → deploy branch */
+    for (const file of HTML_FILES) {
+      const srcRes = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/contents/${file}?ref=${encodeURIComponent(srcBranch)}`,
+        { headers }
+      );
+      if (!srcRes.ok) continue;
+      const { content } = await srcRes.json();
+      const b64 = content.replace(/\n/g, '');
+      btn.textContent = `Syncing ${file}…`;
+      await pushFile(owner, repo, file, b64, destBranch, headers);
     }
 
-    setGhMsg('Published! Your site will update in ~1 minute.', true);
+    /* 2 — Push config.js with current admin data */
+    btn.textContent = 'Pushing config…';
+    const configB64 = btoa(unescape(encodeURIComponent(generateConfigContent())));
+    await pushFile(owner, repo, 'config.js', configB64, destBranch, headers);
+
+    setGhMsg('Published! Site will update in ~1 minute.', true);
     showToast('Published to GitHub!');
   } catch (err) {
     setGhMsg('Error: ' + err.message, false);
