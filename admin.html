@@ -648,7 +648,7 @@ function collectClients() {
 
 async function handleClientLogo(input, i) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 300, 150, 0.8, 'image/png');
+  const dataURL = await compressImage(input.files[0], 600, 300, 0.9, 'image/png');
   const prev = document.getElementById(`cl-prev-${i}`);
   prev.innerHTML = `<img src="${dataURL}">`;
 }
