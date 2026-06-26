@@ -58,22 +58,20 @@
     #nav.scrolled-light {
       background: rgba(255,255,255,0.9);
       backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(20,17,5,.07);
     }
     #nav.scrolled-dark {
       background: rgba(20,17,5,0.88);
       backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
     /* Theme: light bg → dark nav text */
-    #nav[data-theme="light"] { border-bottom: 1px solid rgba(20,17,5,.1); }
+    #nav[data-theme="light"] { border-bottom: 1px solid rgba(20,17,5,.08); }
     #nav[data-theme="light"] .nav-link { color: rgba(20,17,5,.45); }
     #nav[data-theme="light"] .nav-link:hover { color: var(--dk); }
     #nav[data-theme="light"] .ham-line { background: var(--dk); }
 
     /* Theme: dark bg → light nav text */
-    #nav[data-theme="dark"] { border-bottom: 1px solid transparent; }
+    #nav[data-theme="dark"] { border-bottom: none; }
     #nav[data-theme="dark"] .nav-link { color: rgba(255,255,255,.45); }
     #nav[data-theme="dark"] .nav-link:hover { color: var(--wh); }
     #nav[data-theme="dark"] .ham-line { background: var(--wh); }
