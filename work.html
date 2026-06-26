@@ -50,7 +50,7 @@
     .mob-link:hover{color:var(--y);}
 
     /* Work cards */
-    .work-card{position:relative;overflow:hidden;cursor:pointer;background:#0e0d04;}
+    .work-card{position:relative;overflow:hidden;cursor:pointer;background:#0e0d04;border-radius:28px;}
     .work-overlay{position:absolute;inset:0;background:var(--y);display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;opacity:0;transition:opacity .3s ease;}
     .work-card:hover .work-overlay{opacity:1;}
 
@@ -120,35 +120,106 @@
   </section>
 
   <!-- Work grid -->
-  <section data-nav-theme="light" style="background:var(--wh);padding:3rem 0 7rem;">
+  <section id="work-section" data-nav-theme="light" style="background:var(--wh);padding:3rem 0 7rem;">
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
-      <div id="work-grid" style="display:grid;grid-template-columns:3fr 2fr;gap:1.5rem;"></div>
+      <div id="work-grid" style="display:grid;grid-template-columns:3fr 2fr;gap:1.5rem;transition:opacity .25s ease;"></div>
+      <div id="work-pagination" style="display:none;align-items:center;justify-content:center;gap:.75rem;margin-top:3.5rem;flex-wrap:wrap;"></div>
       <script>
       (function(){
-        const grid = document.getElementById('work-grid');
+        var grid = document.getElementById('work-grid');
+        var pag = document.getElementById('work-pagination');
+        var PER_PAGE = 6;
+        var cur = 1;
+        var parallaxHandler = null;
+        var ph = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><svg width="60" height="40" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="rgba(218,237,0,.1)" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/></svg></div>';
+
         if (!SITE.work.length) {
           grid.parentElement.innerHTML = '<p style="font-family:var(--font-body);color:#aaa;font-size:.95rem;padding:4rem 0;text-align:center;">Case studies coming soon.</p>';
           return;
         }
-        const heights = ['580px','260px','260px','380px','380px'];
-        SITE.work.forEach(function(w,i) {
-          const ph = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><svg width="60" height="40" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="rgba(218,237,0,.1)" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="rgba(218,237,0,.1)" stroke-width="2.5" stroke-linecap="round"/></svg></div>`;
-          const img = w.image ? `<img src="${w.image}" alt="${w.title}" class="work-img">` : ph;
-          const h = heights[i] || '300px';
-          const span = w.tall ? 'grid-row:span 2;' : '';
-          grid.innerHTML += `
-          <a href="${w.link}" class="work-card" style="min-height:${h};display:block;${span}border-radius:8px;">
-            ${img}
-            <div class="work-overlay" style="border-radius:8px;">
-              <span style="font-family:var(--font-body);color:rgba(20,17,5,.55);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;">${w.category} · ${w.year}</span>
-              <h2 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:1.8rem;line-height:1.1;">${w.title}</h2>
-              <span style="font-family:var(--font-body);color:var(--dk);font-weight:600;font-size:.875rem;margin-top:.875rem;">view →</span>
-            </div>
-          </a>`;
-        });
-        const workImgs = grid.querySelectorAll('.work-img');
-        function updateParallax(){workImgs.forEach(function(img){const r=img.closest('.work-card').getBoundingClientRect();const p=(window.innerHeight-r.top)/(window.innerHeight+r.height);img.style.transform='translateY(calc(-7.5% + '+(( p-.5)*40)+'px))';});}
-        if(workImgs.length){window.addEventListener('scroll',updateParallax,{passive:true});updateParallax();}
+
+        var total = Math.max(1, Math.ceil(SITE.work.length / PER_PAGE));
+        var heights = ['580px','260px','260px','380px','380px','300px'];
+
+        function setupParallax() {
+          if (parallaxHandler) window.removeEventListener('scroll', parallaxHandler);
+          var imgs = grid.querySelectorAll('.work-img');
+          if (!imgs.length) return;
+          parallaxHandler = function() {
+            imgs.forEach(function(img) {
+              var r = img.closest('.work-card').getBoundingClientRect();
+              var p = (window.innerHeight - r.top) / (window.innerHeight + r.height);
+              img.style.transform = 'translateY(calc(-7.5% + ' + ((p - .5) * 40) + 'px))';
+            });
+          };
+          window.addEventListener('scroll', parallaxHandler, {passive:true});
+          parallaxHandler();
+        }
+
+        function renderGrid(page) {
+          cur = page;
+          grid.style.opacity = '0';
+          setTimeout(function() {
+            var items = SITE.work.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+            grid.innerHTML = '';
+            items.forEach(function(w, i) {
+              var img = w.image ? '<img src="' + w.image + '" alt="' + w.title + '" class="work-img">' : ph;
+              var h = heights[i] || '300px';
+              var span = w.tall ? 'grid-row:span 2;' : '';
+              grid.innerHTML +=
+                '<a href="' + w.link + '" class="work-card" style="min-height:' + h + ';display:block;' + span + 'border-radius:28px;">' +
+                img +
+                '<div class="work-overlay" style="border-radius:28px;">' +
+                '<span style="font-family:var(--font-body);color:rgba(20,17,5,.55);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;">' + w.category + ' · ' + w.year + '</span>' +
+                '<h2 style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:1.8rem;line-height:1.1;">' + w.title + '</h2>' +
+                '<span style="font-family:var(--font-body);color:var(--dk);font-weight:600;font-size:.875rem;margin-top:.875rem;">view →</span>' +
+                '</div></a>';
+            });
+            setupParallax();
+            grid.style.opacity = '1';
+            renderPag();
+          }, 200);
+        }
+
+        function pgBtn(label, enabled, active, onClick) {
+          var b = document.createElement('button');
+          b.innerHTML = label;
+          b.disabled = !enabled;
+          b.setAttribute('aria-current', active ? 'page' : 'false');
+          var base = 'font-family:var(--font-display);font-weight:900;font-size:.9rem;min-width:3rem;padding:.6rem 1.25rem;border-radius:9999px;border:1.5px solid;cursor:pointer;transition:all .2s ease;';
+          if (active) {
+            b.style.cssText = base + 'background:var(--y);border-color:var(--y);color:var(--dk);cursor:default;';
+          } else if (enabled) {
+            b.style.cssText = base + 'background:transparent;border-color:rgba(20,17,5,.2);color:var(--dk);';
+            b.addEventListener('mouseenter', function(){ b.style.borderColor='var(--dk)'; });
+            b.addEventListener('mouseleave', function(){ b.style.borderColor='rgba(20,17,5,.2)'; });
+            b.addEventListener('click', onClick);
+          } else {
+            b.style.cssText = base + 'background:transparent;border-color:rgba(20,17,5,.1);color:rgba(20,17,5,.2);cursor:default;';
+          }
+          return b;
+        }
+
+        function scrollToSection() {
+          var top = document.getElementById('work-section').getBoundingClientRect().top + window.scrollY - 88;
+          window.scrollTo({top: top, behavior: 'smooth'});
+        }
+
+        function renderPag() {
+          if (total <= 1) { pag.style.display = 'none'; return; }
+          pag.style.display = 'flex';
+          pag.innerHTML = '';
+          pag.appendChild(pgBtn('&larr;', cur > 1, false, function(){ renderGrid(cur - 1); scrollToSection(); }));
+          for (var p = 1; p <= total; p++) {
+            (function(page){
+              var lbl = page < 10 ? '0' + page : '' + page;
+              pag.appendChild(pgBtn(lbl, true, page === cur, function(){ renderGrid(page); scrollToSection(); }));
+            })(p);
+          }
+          pag.appendChild(pgBtn('&rarr;', cur < total, false, function(){ renderGrid(cur + 1); scrollToSection(); }));
+        }
+
+        renderGrid(1);
       })();
       </script>
     </div>
