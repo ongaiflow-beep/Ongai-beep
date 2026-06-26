@@ -444,14 +444,19 @@
       rSpr.t=virScr>600?(virScr-600)/(MAX-600)*360:0;
     }
 
+    function releaseScrLock(){
+      document.body.style.overflow='';
+      capScr=false;
+    }
+
     function onWheel(e){
       if(!capScr) return;
       var rect=sec.getBoundingClientRect();
-      if(rect.top>10||rect.top<-60) return;
+      if(rect.top>10||rect.top<-60){releaseScrLock();return;}
+      if(virScr>=MAX&&e.deltaY>0){releaseScrLock();return;}
+      if(virScr<=0&&e.deltaY<0) return;
       var nv=Math.min(Math.max(virScr+e.deltaY,0),MAX);
       if(nv===virScr) return;
-      if(virScr>=MAX&&e.deltaY>0) return;
-      if(virScr<=0&&e.deltaY<0) return;
       e.preventDefault(); virScr=nv; updTgts();
     }
 
@@ -460,12 +465,12 @@
     function onTM(e){
       if(!capScr) return;
       var rect=sec.getBoundingClientRect();
-      if(rect.top>10||rect.top<-60) return;
+      if(rect.top>10||rect.top<-60){releaseScrLock();return;}
       var dy=ty0-e.touches[0].clientY; ty0=e.touches[0].clientY;
+      if(virScr>=MAX&&dy>0){releaseScrLock();return;}
+      if(virScr<=0&&dy<0) return;
       var nv=Math.min(Math.max(virScr+dy,0),MAX);
       if(nv===virScr) return;
-      if(virScr>=MAX&&dy>0) return;
-      if(virScr<=0&&dy<0) return;
       e.preventDefault(); virScr=nv; updTgts();
     }
 
@@ -479,7 +484,11 @@
 
     updSz(); mkCards();
     setTimeout(function(){phase='line';},500);
-    setTimeout(function(){phase='circle';capScr=true;},2500);
+    setTimeout(function(){
+      phase='circle'; capScr=true;
+      window.scrollTo({top:0,behavior:'instant'});
+      document.body.style.overflow='hidden';
+    },2500);
     requestAnimationFrame(function(t){lastT=t;requestAnimationFrame(loop);});
     window.addEventListener('wheel',onWheel,{passive:false});
     window.addEventListener('touchstart',onTS,{passive:true});
