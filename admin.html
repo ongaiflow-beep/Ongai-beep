@@ -720,6 +720,9 @@ function renderWork(list) {
   el.innerHTML = '';
   list.forEach((w, i) => {
     const chk = w.tall ? 'checked' : '';
+    const galleryPrevs = (w.images||[]).filter(Boolean).map(url =>
+      `<div style="width:56px;height:40px;border-radius:5px;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,0,0,.1);"><img src="${esc(url)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.style.display='none'"></div>`
+    ).join('');
     el.innerHTML += /* html */`
     <div class="form-card" id="work-card-${i}" draggable="true">
       <div class="form-card-head">
@@ -804,11 +807,17 @@ function renderWork(list) {
             <textarea id="w-outcome-${i}" class="form-input" rows="3" placeholder="Result, impact, or key deliverable…">${esc(w.outcome||'')}</textarea>
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">Gallery images <span class="form-hint" style="display:inline;margin:0;">— one URL per line</span></label>
+            <label class="form-label">Gallery images</label>
+            <div class="img-upload-row" style="margin-bottom:.5rem;">
+              <button class="img-btn" type="button" onclick="document.getElementById('w-gfiles-${i}').click()">Upload images</button>
+              <span class="form-hint" style="margin:0;">or paste URLs below, one per line</span>
+            </div>
+            <input type="file" id="w-gfiles-${i}" accept="image/*" multiple onchange="handleGalleryImgs(this, ${i})">
             <textarea id="w-images-${i}" class="form-input" rows="3" placeholder="https://example.com/img1.jpg&#10;https://example.com/img2.jpg">${esc((w.images||[]).join('\n'))}</textarea>
+            <div id="w-gprev-${i}" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;">${galleryPrevs}</div>
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">PDF case study URL</label>
+            <label class="form-label">Case Study URL</label>
             <input id="w-pdf-${i}" class="form-input" type="url" placeholder="https://example.com/case-study.pdf" value="${esc(w.pdfUrl||'')}">
           </div>
         </div>
@@ -909,6 +918,22 @@ function updateWorkImgPreview(input, i) {
   if (input.value) {
     prev.innerHTML = `<img src="${input.value}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=''">`;
   }
+}
+
+async function handleGalleryImgs(input, i) {
+  if (!input.files || !input.files.length) return;
+  const ta   = document.getElementById(`w-images-${i}`);
+  const prev = document.getElementById(`w-gprev-${i}`);
+  for (const file of Array.from(input.files)) {
+    const dataURL = await compressImage(file, 1200, 800, 0.72);
+    const existing = ta.value.trim();
+    ta.value = existing ? existing + '\n' + dataURL : dataURL;
+    const thumb = document.createElement('div');
+    thumb.style.cssText = 'width:56px;height:40px;border-radius:5px;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,0,0,.1);';
+    thumb.innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;">`;
+    prev.appendChild(thumb);
+  }
+  input.value = '';
 }
 
 /* ══════════════════════════════
