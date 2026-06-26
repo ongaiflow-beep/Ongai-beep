@@ -648,7 +648,7 @@ function collectClients() {
 
 async function handleClientLogo(input, i) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 300, 150, 0.8);
+  const dataURL = await compressImage(input.files[0], 300, 150, 0.8, 'image/png');
   const prev = document.getElementById(`cl-prev-${i}`);
   prev.innerHTML = `<img src="${dataURL}">`;
 }
@@ -896,7 +896,8 @@ async function handleTeamMemberPhoto(input, i) {
 /* ══════════════════════════════
    IMAGE COMPRESSION UTILITY
 ══════════════════════════════ */
-function compressImage(file, maxW, maxH, quality) {
+function compressImage(file, maxW, maxH, quality, format) {
+  var fmt = format || (file.type === 'image/png' ? 'image/png' : 'image/jpeg');
   return new Promise(function(resolve) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -910,8 +911,10 @@ function compressImage(file, maxW, maxH, quality) {
         }
         const c = document.createElement('canvas');
         c.width = w; c.height = h;
-        c.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(c.toDataURL('image/jpeg', quality));
+        const ctx = c.getContext('2d');
+        if (fmt === 'image/png') ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL(fmt, quality));
       };
       img.src = e.target.result;
     };
@@ -924,7 +927,7 @@ function compressImage(file, maxW, maxH, quality) {
 ══════════════════════════════ */
 async function handleLogoUpload(input) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 400, 200, 0.85);
+  const dataURL = await compressImage(input.files[0], 400, 200, 0.85, 'image/png');
   document.getElementById('logo-preview').innerHTML = `<img src="${dataURL}">`;
 }
 
