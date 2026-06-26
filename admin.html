@@ -744,10 +744,6 @@ function renderWork(list) {
           <label class="form-label">Year</label>
           <input id="w-year-${i}" class="form-input" type="text" value="${esc(w.year||'')}" style="max-width:120px;">
         </div>
-        <div class="form-group">
-          <label class="form-label">Link (URL or #)</label>
-          <input id="w-link-${i}" class="form-input" type="text" value="${esc(w.link||'#')}">
-        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Image</label>
@@ -771,6 +767,52 @@ function renderWork(list) {
           <span class="toggle-thumb"></span>
         </label>
       </div>
+      <details style="margin-top:1rem;">
+        <summary style="cursor:pointer;font-size:.78rem;font-weight:600;color:rgba(20,17,5,.45);letter-spacing:.06em;user-select:none;padding:.4rem 0;list-style:none;display:flex;align-items:center;gap:.4rem;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="transition:transform .2s;flex-shrink:0;" class="details-arrow"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Case Study Details
+        </summary>
+        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:1rem;">
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Client name</label>
+              <input id="w-client-${i}" class="form-input" type="text" placeholder="e.g. Acme Corp" value="${esc(w.client||'')}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Services (comma-separated)</label>
+              <input id="w-services-${i}" class="form-input" type="text" placeholder="Visual Identity, Brand Strategy" value="${esc((w.services||[]).join(', '))}">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Overview</label>
+            <textarea id="w-overview-${i}" class="form-input" rows="3" placeholder="1–2 paragraph project summary…">${esc(w.overview||'')}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Challenge</label>
+            <textarea id="w-challenge-${i}" class="form-input" rows="3" placeholder="What problem needed solving?">${esc(w.challenge||'')}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Solution</label>
+            <textarea id="w-solution-${i}" class="form-input" rows="3" placeholder="How did you solve it?">${esc(w.solution||'')}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Process</label>
+            <textarea id="w-process-${i}" class="form-input" rows="3" placeholder="Approach and steps taken…">${esc(w.process||'')}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Outcome</label>
+            <textarea id="w-outcome-${i}" class="form-input" rows="3" placeholder="Result, impact, or key deliverable…">${esc(w.outcome||'')}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Gallery images <span class="form-hint" style="display:inline;margin:0;">— one URL per line</span></label>
+            <textarea id="w-images-${i}" class="form-input" rows="3" placeholder="https://example.com/img1.jpg&#10;https://example.com/img2.jpg">${esc((w.images||[]).join('\n'))}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">PDF case study URL</label>
+            <input id="w-pdf-${i}" class="form-input" type="url" placeholder="https://example.com/case-study.pdf" value="${esc(w.pdfUrl||'')}">
+          </div>
+        </div>
+      </details>
     </div>`;
   });
   initWorkDrag();
@@ -818,7 +860,7 @@ function initWorkDrag() {
 
 function addWork() {
   const list = collectWork();
-  list.push({ title: 'Project Name', category: 'Brand Identity', year: new Date().getFullYear().toString(), image: '', link: '#', tall: list.length === 0 });
+  list.push({ title: 'Project Name', category: 'Brand Identity', year: new Date().getFullYear().toString(), image: '', tall: list.length === 0, client: '', overview: '', challenge: '', solution: '', process: '', outcome: '', services: [], images: [], pdfUrl: '' });
   renderWork(list);
 }
 
@@ -830,14 +872,28 @@ function removeWork(i) {
 
 function collectWork() {
   const cards = document.querySelectorAll('[id^="work-card-"]');
-  return Array.from(cards).map((_, i) => ({
-    title:    document.getElementById(`w-title-${i}`).value.trim(),
-    category: document.getElementById(`w-cat-${i}`).value.trim(),
-    year:     document.getElementById(`w-year-${i}`).value.trim(),
-    link:     document.getElementById(`w-link-${i}`).value.trim() || '#',
-    image:    document.getElementById(`w-img-${i}`).value.trim(),
-    tall:     document.getElementById(`w-tall-${i}`).checked,
-  }));
+  return Array.from(cards).map((_, i) => {
+    const servicesRaw = document.getElementById(`w-services-${i}`) ? document.getElementById(`w-services-${i}`).value : '';
+    const services = servicesRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const imagesRaw = document.getElementById(`w-images-${i}`) ? document.getElementById(`w-images-${i}`).value : '';
+    const images = imagesRaw.split('\n').map(s => s.trim()).filter(Boolean);
+    return {
+      title:     document.getElementById(`w-title-${i}`).value.trim(),
+      category:  document.getElementById(`w-cat-${i}`).value.trim(),
+      year:      document.getElementById(`w-year-${i}`).value.trim(),
+      image:     document.getElementById(`w-img-${i}`).value.trim(),
+      tall:      document.getElementById(`w-tall-${i}`).checked,
+      client:    document.getElementById(`w-client-${i}`)   ? document.getElementById(`w-client-${i}`).value.trim()   : '',
+      overview:  document.getElementById(`w-overview-${i}`) ? document.getElementById(`w-overview-${i}`).value.trim() : '',
+      challenge: document.getElementById(`w-challenge-${i}`)? document.getElementById(`w-challenge-${i}`).value.trim(): '',
+      solution:  document.getElementById(`w-solution-${i}`) ? document.getElementById(`w-solution-${i}`).value.trim() : '',
+      process:   document.getElementById(`w-process-${i}`)  ? document.getElementById(`w-process-${i}`).value.trim()  : '',
+      outcome:   document.getElementById(`w-outcome-${i}`)  ? document.getElementById(`w-outcome-${i}`).value.trim()  : '',
+      services:  services,
+      images:    images,
+      pdfUrl:    document.getElementById(`w-pdf-${i}`)      ? document.getElementById(`w-pdf-${i}`).value.trim()      : '',
+    };
+  });
 }
 
 async function handleWorkImg(input, i) {
@@ -1071,7 +1127,11 @@ function exportConfig() {
   }
 
   const services = (d.services||[]).map(s => `    { title: ${jsVal(s.title)}, desc: ${jsVal(s.desc)} },`).join('\n');
-  const work = (d.work||[]).map(w => `    { title: ${jsVal(w.title)}, category: ${jsVal(w.category)}, year: ${jsVal(w.year)}, image: ${jsVal(w.image)}, link: ${jsVal(w.link)}, tall: ${w.tall} },`).join('\n');
+  const work = (d.work||[]).map(w => {
+    const svcs = (w.services||[]).map(s => jsVal(s)).join(', ');
+    const imgs = (w.images||[]).map(s => jsVal(s)).join(', ');
+    return `    { title: ${jsVal(w.title)}, category: ${jsVal(w.category)}, year: ${jsVal(w.year)}, client: ${jsVal(w.client||'')}, image: ${jsVal(w.image)}, tall: ${!!w.tall}, overview: ${jsVal(w.overview||'')}, challenge: ${jsVal(w.challenge||'')}, solution: ${jsVal(w.solution||'')}, process: ${jsVal(w.process||'')}, outcome: ${jsVal(w.outcome||'')}, services: [${svcs}], images: [${imgs}], pdfUrl: ${jsVal(w.pdfUrl||'')} },`;
+  }).join('\n');
   const clients = (d.clients||[]).map(c => `    { name: ${jsVal(c.name)}, image: ${jsVal(c.image)} },`).join('\n');
   const values = (d.about&&d.about.values||[]).map(v => `      ${jsVal(v)},`).join('\n');
   const team = (d.about&&d.about.team||[]).map(m => `      { name: ${jsVal(m.name)}, role: ${jsVal(m.role)}, photo: ${jsVal(m.photo)} },`).join('\n');

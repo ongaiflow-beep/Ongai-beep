@@ -69,15 +69,68 @@ const SITE = {
      • title: project name
      • category: e.g. 'Brand Identity'
      • year: e.g. '2025'
-     • image: path to project image, e.g. 'assets/work/project1.jpg'
+     • client: client name shown on the detail page
+     • image: path to project thumbnail, e.g. 'assets/work/project1.jpg'
        Leave image empty to show a branded placeholder.
-     • link: URL to case study, or '#' to disable
-     • tall: true makes the card taller (use for the first/feature card)
+     • tall: true makes the grid card taller (use for the first/feature card)
+     • overview: 1-2 paragraph project summary
+     • challenge: the problem that needed solving
+     • solution: how the problem was solved
+     • process: the approach and steps taken
+     • outcome: result, impact, or key deliverable
+     • services: array of services used, e.g. ['Visual Identity', 'Brand Strategy']
+     • images: array of extra gallery image URLs
+     • pdfUrl: link to a PDF case study (shows viewer + download button)
   ─────────────────────────────────────────── */
   work: [
-    { title: 'Project Name', category: 'Brand Identity',  year: '2025', image: '', link: '#', tall: true  },
-    { title: 'Project Name', category: 'Logo & Branding', year: '2025', image: '', link: '#', tall: false },
-    { title: 'Project Name', category: 'Brand Strategy',  year: '2025', image: '', link: '#', tall: false },
+    {
+      title:     'Project Name',
+      category:  'Brand Identity',
+      year:      '2025',
+      client:    '',
+      image:     '',
+      tall:      true,
+      overview:  '',
+      challenge: '',
+      solution:  '',
+      process:   '',
+      outcome:   '',
+      services:  [],
+      images:    [],
+      pdfUrl:    '',
+    },
+    {
+      title:     'Project Name',
+      category:  'Logo & Branding',
+      year:      '2025',
+      client:    '',
+      image:     '',
+      tall:      false,
+      overview:  '',
+      challenge: '',
+      solution:  '',
+      process:   '',
+      outcome:   '',
+      services:  [],
+      images:    [],
+      pdfUrl:    '',
+    },
+    {
+      title:     'Project Name',
+      category:  'Brand Strategy',
+      year:      '2025',
+      client:    '',
+      image:     '',
+      tall:      false,
+      overview:  '',
+      challenge: '',
+      solution:  '',
+      process:   '',
+      outcome:   '',
+      services:  [],
+      images:    [],
+      pdfUrl:    '',
+    },
   ],
 
   /* ── ABOUT ────────────────────────────────
