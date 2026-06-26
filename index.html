@@ -239,6 +239,11 @@
     /* Mobile padding */
     .px-site { padding-left: clamp(1.5rem, 5vw, 4rem); padding-right: clamp(1.5rem, 5vw, 4rem); }
 
+    /* ── Word cycler ── */
+    .text-cycle-wrap { display:block; overflow:hidden; }
+    .text-cycle-word { display:block; }
+    @media(prefers-reduced-motion:reduce){ .text-cycle-word{ transition:none !important; } }
+
     /* ── Morph Hero ── */
     #mh { position:relative; height:100vh; overflow:hidden; background:var(--wh); }
     #mh-wrap { position:absolute; inset:0; overflow:hidden; }
@@ -308,7 +313,7 @@
 
     <div id="mh-intro" style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:2rem;">
       <p style="font-family:var(--font-body);color:rgba(20,17,5,.38);font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;margin-bottom:2rem;">branding. effectively, not aesthetic.</p>
-      <h1 class="h-hero" style="color:var(--dk);max-width:820px;">we make your brand <span style="color:var(--y);">noticed.</span></h1>
+      <h1 class="h-hero" style="color:var(--dk);max-width:820px;">we help your brand<br><span class="text-cycle-wrap"><span class="text-cycle-word" style="color:var(--y);">Noticed.</span></span></h1>
       <p style="font-family:var(--font-body);color:rgba(20,17,5,.25);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-top:2.5rem;">scroll to explore</p>
     </div>
 
@@ -507,9 +512,9 @@
       </p>
 
       <h1 class="h-hero reveal" style="color:var(--dk);max-width:900px;transition-delay:.05s;">
-        we make<br>
+        we help<br>
         your brand<br>
-        <span class="text-y">noticed.</span>
+        <span class="text-cycle-wrap"><span class="text-cycle-word text-y">Noticed.</span></span>
       </h1>
 
       <div class="reveal" style="display:flex;flex-wrap:wrap;align-items:center;gap:2.5rem;margin-top:4rem;transition-delay:.12s;">
@@ -896,6 +901,41 @@
       el.classList.add('in');
     });
   }, 60);
+
+  /* ── Word cycler: Noticed. → Stands out. → Dominance. ── */
+  (function () {
+    var WORDS = ['Noticed.', 'Stands out.', 'Dominance.'];
+    var cur = 0;
+    var els = document.querySelectorAll('.text-cycle-word');
+    if (!els.length) return;
+    function cycleNext() {
+      var next = (cur + 1) % WORDS.length;
+      els.forEach(function (el) {
+        el.style.transition = 'transform .45s cubic-bezier(.22,1,.36,1), opacity .35s ease';
+        el.style.transform = 'translateY(-110%)';
+        el.style.opacity = '0';
+      });
+      setTimeout(function () {
+        cur = next;
+        els.forEach(function (el) {
+          el.style.transition = 'none';
+          el.style.transform = 'translateY(110%)';
+          el.style.opacity = '0';
+          el.textContent = WORDS[cur];
+        });
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            els.forEach(function (el) {
+              el.style.transition = 'transform .5s cubic-bezier(.22,1,.36,1), opacity .4s ease';
+              el.style.transform = 'translateY(0)';
+              el.style.opacity = '1';
+            });
+          });
+        });
+      }, 460);
+    }
+    setInterval(cycleNext, 2800);
+  })();
 
 })();
 </script>
