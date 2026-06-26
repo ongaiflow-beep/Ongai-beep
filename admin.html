@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Ongai Flow</title>
+  <script src="config.js"></script>
   <style>
     :root {
       --y:   #DAED00;
@@ -117,8 +118,8 @@
     .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;transition:transform .25s;pointer-events:none;}
     .toggle input:checked ~ .toggle-thumb{transform:translateX(18px);}
 
-    /* Toast */
-    #toast{position:fixed;bottom:2rem;right:2rem;background:var(--y);color:var(--dk);font-weight:700;font-size:.85rem;padding:.75rem 1.5rem;border-radius:8px;transform:translateY(120%);transition:transform .35s cubic-bezier(.22,1,.36,1);z-index:99;pointer-events:none;}
+    /* Toast — transition added via JS after first paint to prevent FOUC */
+    #toast{position:fixed;bottom:2rem;right:2rem;background:var(--y);color:var(--dk);font-weight:700;font-size:.85rem;padding:.75rem 1.5rem;border-radius:8px;transform:translateY(120%);z-index:99;pointer-events:none;}
     #toast.show{transform:translateY(0);}
 
     /* Divider */
@@ -528,47 +529,52 @@ function loadAll() {
 
 /* ── SAVE ALL ── */
 function saveAll() {
-  const d = getData();
+  try {
+    const d = getData();
 
-  d.name    = document.getElementById('g-name').value.trim();
-  d.email   = document.getElementById('g-email').value.trim();
-  d.tagline = document.getElementById('g-tagline').value.trim();
-  d.year    = document.getElementById('g-year').value.trim();
-  d.formEndpoint = document.getElementById('g-form').value.trim();
-  d.social = {
-    instagram: document.getElementById('g-ig').value.trim() || '#',
-    linkedin:  document.getElementById('g-li').value.trim() || '#',
-    behance:   document.getElementById('g-bh').value.trim() || '#',
-  };
+    d.name    = document.getElementById('g-name').value.trim();
+    d.email   = document.getElementById('g-email').value.trim();
+    d.tagline = document.getElementById('g-tagline').value.trim();
+    d.year    = document.getElementById('g-year').value.trim();
+    d.formEndpoint = document.getElementById('g-form').value.trim();
+    d.social = {
+      instagram: document.getElementById('g-ig').value.trim() || '#',
+      linkedin:  document.getElementById('g-li').value.trim() || '#',
+      behance:   document.getElementById('g-bh').value.trim() || '#',
+    };
 
-  // Logo (kept in data via img preview src if set)
-  const logoImgEl = document.querySelector('#logo-preview img');
-  if (!d.logo) d.logo = {};
-  d.logo.image = logoImgEl ? logoImgEl.src : '';
+    // Logo (kept in data via img preview src if set)
+    const logoImgEl = document.querySelector('#logo-preview img');
+    if (!d.logo) d.logo = {};
+    d.logo.image = logoImgEl ? logoImgEl.src : '';
 
-  // About text
-  if (!d.about) d.about = {};
-  d.about.headline = document.getElementById('ab-headline').value.trim();
-  d.about.body     = document.getElementById('ab-body').value.trim();
-  d.about.quote    = document.getElementById('ab-quote').value.trim();
-  const tpEl = document.querySelector('#team-photo-preview img');
-  d.about.teamPhoto = tpEl ? tpEl.src : '';
+    // About text
+    if (!d.about) d.about = {};
+    d.about.headline = document.getElementById('ab-headline').value.trim();
+    d.about.body     = document.getElementById('ab-body').value.trim();
+    d.about.quote    = document.getElementById('ab-quote').value.trim();
+    const tpEl = document.querySelector('#team-photo-preview img');
+    d.about.teamPhoto = tpEl ? tpEl.src : '';
 
-  // Clients
-  d.clients = collectClients();
+    // Clients
+    d.clients = collectClients();
 
-  // Services
-  d.services = collectServices();
+    // Services
+    d.services = collectServices();
 
-  // Work
-  d.work = collectWork();
+    // Work
+    d.work = collectWork();
 
-  // About values & team
-  d.about.values = collectValues();
-  d.about.team   = collectTeam();
+    // About values & team
+    d.about.values = collectValues();
+    d.about.team   = collectTeam();
 
-  saveData(d);
-  showToast('Changes saved!');
+    saveData(d);
+    showToast('Changes saved!');
+  } catch(err) {
+    showToast('Save failed: ' + err.message);
+    console.error('saveAll error:', err);
+  }
 }
 
 /* ── Toast ── */
@@ -1046,6 +1052,11 @@ try {
 
 /* ── Utility ── */
 function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+/* Enable toast slide transition only after initial paint — prevents FOUC on page load */
+requestAnimationFrame(function(){ requestAnimationFrame(function(){
+  document.getElementById('toast').style.transition = 'transform .35s cubic-bezier(.22,1,.36,1)';
+}); });
 </script>
 </body>
 </html>
