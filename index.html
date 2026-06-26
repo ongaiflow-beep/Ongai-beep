@@ -535,6 +535,27 @@
 
 
 
+  <!-- ── CLIENTS ── (white, nav→light) -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:3.5rem 0;border-top:1px solid rgba(20,17,5,.06);border-bottom:1px solid rgba(20,17,5,.06);">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
+      <p style="font-family:var(--font-body);color:#bbb;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:2rem;">trusted by</p>
+      <div id="clients-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:3rem;"></div>
+    </div>
+  </section>
+  <script>
+  (function(){
+    const row = document.getElementById('clients-row');
+    SITE.clients.forEach(function(c) {
+      if (c.image) {
+        row.innerHTML += '<img src="'+c.image+'" alt="'+c.name+'" class="client-img">';
+      } else {
+        row.innerHTML += '<div class="client-ph" title="'+c.name+'"><svg width="28" height="14" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#c8d800" stroke-width="3" fill="none" opacity=".4"/><line x1="31" y1="6" x2="31" y2="22" stroke="#c8d800" stroke-width="2" stroke-linecap="round" opacity=".4"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#c8d800" stroke-width="2" stroke-linecap="round" opacity=".4"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#c8d800" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg></div>';
+      }
+    });
+  })();
+  </script>
+
+
   <!-- ── MARQUEE ── -->
   <div class="bg-y" style="overflow:hidden;padding:.8rem 0;" aria-hidden="true">
     <div class="marquee-inner">
