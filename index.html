@@ -248,15 +248,10 @@
     /* ── Morph Hero ── */
     #mh { position:relative; height:100vh; overflow:hidden; background:var(--wh); }
     #mh-wrap { position:absolute; inset:0; overflow:hidden; }
-    .mc { position:absolute; left:50%; top:50%; margin-left:-50px; margin-top:-70px; width:100px; height:140px; cursor:pointer; transform-style:preserve-3d; will-change:transform; }
-    .mc-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.34,1.56,.64,1); }
-    .mc:hover .mc-inner { transform:rotateY(180deg); }
-    .mc-f, .mc-b { position:absolute; inset:0; border-radius:10px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
-    .mc-f { box-shadow:0 4px 20px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.07); }
+    .mc { position:absolute; left:50%; top:50%; margin-left:-50px; margin-top:-70px; width:100px; height:140px; cursor:pointer; will-change:transform; transition:box-shadow .25s ease; }
+    .mc-f { position:absolute; inset:0; border-radius:10px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.07); transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease; }
+    .mc:hover .mc-f { transform:translateY(-7px); box-shadow:0 14px 36px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.10); }
     .mc-f img { width:100%; height:100%; object-fit:cover; display:block; }
-    .mc-f::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.08); transition:opacity .2s; }
-    .mc:hover .mc-f::after { opacity:0; }
-    .mc-b { transform:rotateY(180deg); background:var(--dk); border:1px solid rgba(218,237,0,.25); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,.12); }
   </style>
 </head>
 <body>
@@ -392,13 +387,9 @@
     function mkCards(){
       IMGS.slice(0,N).forEach(function(src,i){
         var c=document.createElement('div'); c.className='mc';
-        var inn=document.createElement('div'); inn.className='mc-inner';
         var f=document.createElement('div'); f.className='mc-f';
         var img=document.createElement('img'); img.src=src; img.alt=''; img.loading='lazy';
-        f.appendChild(img);
-        var b=document.createElement('div'); b.className='mc-b';
-        b.innerHTML='<span style="font-family:var(--font-body);font-size:.65rem;font-weight:700;color:var(--y);letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:2;">View<br>Project</span>';
-        inn.appendChild(f); inn.appendChild(b); c.appendChild(inn); wrap.appendChild(c);
+        f.appendChild(img); c.appendChild(f); wrap.appendChild(c);
         c.style.transform='translate('+scatter[i].x+'px,'+scatter[i].y+'px) rotate('+scatter[i].r+'deg) scale(.5)';
         c.style.opacity='0';
         cards.push(c);
