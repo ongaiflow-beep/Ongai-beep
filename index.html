@@ -246,16 +246,17 @@
     .px-site { padding-left: clamp(1.5rem, 5vw, 4rem); padding-right: clamp(1.5rem, 5vw, 4rem); }
 
     /* ── Morph Hero ── */
-    #mh { position:relative; height:100vh; overflow:hidden; background:var(--dk); }
+    #mh { position:relative; height:100vh; overflow:hidden; background:var(--wh); }
     #mh-wrap { position:absolute; inset:0; overflow:hidden; }
     .mc { position:absolute; left:50%; top:50%; margin-left:-30px; margin-top:-42.5px; width:60px; height:85px; cursor:pointer; transform-style:preserve-3d; will-change:transform; }
     .mc-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.34,1.56,.64,1); }
     .mc:hover .mc-inner { transform:rotateY(180deg); }
     .mc-f, .mc-b { position:absolute; inset:0; border-radius:10px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+    .mc-f { box-shadow:0 4px 20px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.07); }
     .mc-f img { width:100%; height:100%; object-fit:cover; display:block; }
-    .mc-f::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.2); transition:opacity .2s; }
+    .mc-f::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.08); transition:opacity .2s; }
     .mc:hover .mc-f::after { opacity:0; }
-    .mc-b { transform:rotateY(180deg); background:#1a1803; border:1px solid rgba(218,237,0,.25); display:flex; align-items:center; justify-content:center; }
+    .mc-b { transform:rotateY(180deg); background:var(--dk); border:1px solid rgba(218,237,0,.25); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,.12); }
   </style>
 </head>
 <body>
@@ -269,7 +270,7 @@
 
 
 <!-- ═══════ NAVBAR ═══════ -->
-<nav id="nav" data-theme="dark" aria-label="Main navigation">
+<nav id="nav" data-theme="light" aria-label="Main navigation">
   <a href="index.html" style="display:flex;align-items:center;gap:.7rem;" aria-label="Ongai Flow home">
     <!-- Logo mark: circle O + 6-point asterisk -->
     <svg id="logo-mark" width="42" height="28" viewBox="0 0 42 28" fill="none" aria-hidden="true">
@@ -313,26 +314,26 @@
 <main id="main">
 
   <!-- ── MORPH INTRO ── (dark, nav→dark) -->
-  <section id="mh" data-nav-theme="dark">
+  <section id="mh" data-nav-theme="light">
     <div id="mh-wrap" aria-hidden="true"></div>
 
     <div id="mh-intro" style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:2rem;">
-      <p style="font-family:var(--font-body);color:rgba(255,255,255,.28);font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;margin-bottom:2rem;">branding. effectively, not aesthetic.</p>
-      <h1 class="h-hero" style="color:var(--wh);max-width:820px;">we make your brand <span style="color:var(--y);">noticed.</span></h1>
-      <p style="font-family:var(--font-body);color:rgba(255,255,255,.2);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-top:2.5rem;">scroll to explore</p>
+      <p style="font-family:var(--font-body);color:#aaa;font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;margin-bottom:2rem;">branding. effectively, not aesthetic.</p>
+      <h1 class="h-hero" style="color:var(--dk);max-width:820px;">we make your brand <span style="color:var(--y);">noticed.</span></h1>
+      <p style="font-family:var(--font-body);color:rgba(20,17,5,.25);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-top:2.5rem;">scroll to explore</p>
     </div>
 
     <div id="mh-arc" style="position:absolute;top:8%;left:0;right:0;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none;padding:2rem;opacity:0;">
       <p style="font-family:var(--font-body);color:var(--y);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.25rem;">selected work</p>
-      <h2 class="h-section" style="color:var(--wh);">our <span style="color:var(--y);">work.</span></h2>
+      <h2 class="h-section" style="color:var(--dk);">our <span style="color:var(--y);">work.</span></h2>
     </div>
 
     <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;">
-      <div style="width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.2));"></div>
-      <span style="font-family:var(--font-body);color:rgba(255,255,255,.18);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;">scroll</span>
+      <div style="width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(20,17,5,.15));"></div>
+      <span style="font-family:var(--font-body);color:rgba(20,17,5,.22);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;">scroll</span>
     </div>
 
-    <button id="mh-skip" style="position:absolute;bottom:2rem;right:2rem;z-index:20;font-family:var(--font-body);font-size:.7rem;color:rgba(255,255,255,.3);background:none;border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:.4rem 1rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,.35)'" onmouseout="this.style.color='rgba(255,255,255,.3)';this.style.borderColor='rgba(255,255,255,.12)'">Skip →</button>
+    <button id="mh-skip" style="position:absolute;bottom:2rem;right:2rem;z-index:20;font-family:var(--font-body);font-size:.7rem;color:rgba(20,17,5,.38);background:none;border:1px solid rgba(20,17,5,.14);border-radius:9999px;padding:.4rem 1rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='var(--dk)';this.style.borderColor='rgba(20,17,5,.4)'" onmouseout="this.style.color='rgba(20,17,5,.38)';this.style.borderColor='rgba(20,17,5,.14)'">Skip →</button>
   </section>
 
   <script>
