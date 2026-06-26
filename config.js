@@ -56,28 +56,12 @@ const SITE = {
   /* ── SERVICES ─────────────────────────── */
   services: [
     {
-      title: 'Logo & Branding',
-      desc: 'A symbol that truly represents your brand personality — not just how good it looks.',
-    },
-    {
-      title: 'Brand Strategy',
-      desc: 'We flow to the core — identifying the real brand problem and building the right solution.',
-    },
-    {
       title: 'Visual Identity',
       desc: 'A complete visual system — color, type, and layout — that says who you are without a word.',
     },
     {
-      title: 'Art Direction',
-      desc: 'Creative direction that makes every visual asset speak the same brand language.',
-    },
-    {
-      title: 'Brand Guidelines',
-      desc: 'Your brand rulebook — so your identity stays consistent at every touchpoint.',
-    },
-    {
-      title: 'Brand Naming',
-      desc: 'A name is the first thing people hear. We help you find one that sticks and means something.',
+      title: 'Brand Strategy',
+      desc: 'We flow to the core — identifying the real brand problem and building the right solution.',
     },
   ],
 
