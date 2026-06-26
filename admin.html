@@ -649,7 +649,10 @@ function collectClients() {
 
 async function handleClientLogo(input, i) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 380, 190, 0.82, 'image/png');
+  const file = input.files[0];
+  const dataURL = file.type === 'image/svg+xml'
+    ? await new Promise(function(r){ const fr=new FileReader(); fr.onload=function(e){r(e.target.result);}; fr.readAsDataURL(file); })
+    : await compressImage(file, 380, 190, 0.82, 'image/png');
   const prev = document.getElementById(`cl-prev-${i}`);
   prev.innerHTML = `<img src="${dataURL}">`;
 }
@@ -928,7 +931,10 @@ function compressImage(file, maxW, maxH, quality, format) {
 ══════════════════════════════ */
 async function handleLogoUpload(input) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 300, 150, 0.82, 'image/png');
+  const file = input.files[0];
+  const dataURL = file.type === 'image/svg+xml'
+    ? await new Promise(function(r){ const fr=new FileReader(); fr.onload=function(e){r(e.target.result);}; fr.readAsDataURL(file); })
+    : await compressImage(file, 300, 150, 0.82, 'image/png');
   document.getElementById('logo-preview').innerHTML = `<img src="${dataURL}">`;
 }
 
