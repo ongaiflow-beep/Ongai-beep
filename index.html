@@ -50,6 +50,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 50;
       padding: 1.5rem 3rem;
       display: flex; align-items: center; justify-content: space-between;
+      transform: translateY(-100%);
       transition: transform 0.4s cubic-bezier(.22,1,.36,1),
                   background 0.35s ease, border-color 0.35s ease,
                   backdrop-filter 0.35s ease;
@@ -827,10 +828,11 @@
 
   /* ── Navbar: adaptive theme + hide/show ── */
   const nav = document.getElementById('nav');
+  const mhEl = document.getElementById('mh');
   const themedSections = document.querySelectorAll('[data-nav-theme]');
   let lastScrollY = 0;
   let ticking = false;
-  let navHidden = false;
+  let navHidden = true;
 
   function getTheme() {
     const top = window.scrollY + 80;
@@ -851,13 +853,21 @@
     nav.classList.remove('scrolled-light', 'scrolled-dark');
     if (y > 80) nav.classList.add(theme === 'dark' ? 'scrolled-dark' : 'scrolled-light');
 
-    if (y < 100) {
-      nav.style.transform = 'translateY(0)';
-      navHidden = false;
-    } else if (diff > 8 && !navHidden) {
+    const heroH = mhEl ? mhEl.offsetHeight : window.innerHeight;
+    if (y < heroH) {
+      // Inside hero — keep hidden
       nav.style.transform = 'translateY(-100%)';
       navHidden = true;
-    } else if (diff < -8 && navHidden) {
+    } else if (navHidden) {
+      // Just crossed past hero — always show
+      nav.style.transform = 'translateY(0)';
+      navHidden = false;
+    } else if (diff > 8) {
+      // Scrolling down — hide
+      nav.style.transform = 'translateY(-100%)';
+      navHidden = true;
+    } else if (diff < -8) {
+      // Scrolling up — show
       nav.style.transform = 'translateY(0)';
       navHidden = false;
     }
