@@ -65,6 +65,9 @@
     .btn-preview:hover{background:rgba(0,0,0,.1);color:var(--dk);}
     .btn-export{background:transparent;color:rgba(20,17,5,.45);font-family:var(--font);font-size:.82rem;border:1px solid rgba(0,0,0,.12);border-radius:7px;padding:.55rem 1.25rem;cursor:pointer;transition:all .2s;}
     .btn-export:hover{border-color:var(--dk);color:var(--dk);}
+    .btn-publish{background:#1a7f3c;color:#fff;font-family:var(--font);font-weight:700;font-size:.82rem;border:none;border-radius:7px;padding:.55rem 1.25rem;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-publish:hover{background:#15692f;}
+    .btn-publish:disabled{opacity:.55;cursor:not-allowed;}
 
     /* Content */
     .content{flex:1;overflow-y:auto;padding:2rem;}
@@ -230,6 +233,10 @@
       <span class="top-title" id="top-label">General Settings</span>
       <div class="top-actions">
         <button class="btn-export" onclick="exportConfig()">Export config.js</button>
+        <button class="btn-publish" id="btn-publish" onclick="publishToGitHub()">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Publish live
+        </button>
         <a href="index.html" target="_blank" class="btn-preview">
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M5 2H2a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M8 1h5m0 0v5M13 1L6 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Preview site
@@ -393,6 +400,31 @@
         </div>
         <div id="sec-msg" style="font-size:.82rem;margin-top:.5rem;display:none;"></div>
         <button class="btn-save" style="margin-top:1rem;" onclick="changePassword()">Update password</button>
+
+        <div class="divider"></div>
+        <p class="section-title">Publish to GitHub</p>
+        <div class="cred-info">
+          Enter a GitHub <strong>Personal Access Token</strong> (with <code style="background:rgba(0,0,0,.06);padding:.1em .4em;border-radius:4px;font-size:.88em;">repo</code> scope) so the <strong>Publish live</strong> button can push <code style="background:rgba(0,0,0,.06);padding:.1em .4em;border-radius:4px;font-size:.88em;">config.js</code> directly to your repo — making all saved changes visible to everyone instantly.
+        </div>
+        <div class="form-group">
+          <label class="form-label">GitHub Personal Access Token</label>
+          <input type="password" id="gh-token" class="form-input" placeholder="ghp_xxxxxxxxxxxx" oninput="saveGhConfig()">
+        </div>
+        <div style="display:flex;gap:1rem;">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Owner / Org</label>
+            <input id="gh-owner" class="form-input" value="ongaiflow-beep" oninput="saveGhConfig()">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Repository</label>
+            <input id="gh-repo" class="form-input" value="Ongai-beep" oninput="saveGhConfig()">
+          </div>
+          <div class="form-group" style="flex:0 0 120px">
+            <label class="form-label">Branch</label>
+            <input id="gh-branch" class="form-input" value="main" oninput="saveGhConfig()">
+          </div>
+        </div>
+        <div id="gh-msg" style="font-size:.82rem;margin-top:.25rem;display:none;"></div>
       </div>
 
     </div><!-- /content -->
@@ -463,6 +495,7 @@ if (isLoggedIn()) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   loadAll();
+  loadGhConfig();
 }
 
 /* ── Tabs ── */
@@ -1137,10 +1170,9 @@ async function changePassword() {
 }
 
 /* ══════════════════════════════
-   EXPORT config.js
+   EXPORT / PUBLISH config.js
 ══════════════════════════════ */
-function exportConfig() {
-  saveAll();
+function generateConfigContent() {
   const d = getData();
 
   function jsVal(v) {
@@ -1161,8 +1193,9 @@ function exportConfig() {
   const team = (d.about&&d.about.team||[]).map(m => `      { name: ${jsVal(m.name)}, role: ${jsVal(m.role)}, photo: ${jsVal(m.photo)} },`).join('\n');
   const ab = d.about || {};
 
-  const out = `/**
- * ONGAI FLOW — Site Configuration (exported from admin panel)
+  return `/**
+ * ONGAI FLOW — Site Configuration
+ * Last published: ${new Date().toISOString()}
  */
 const SITE = {
   name: ${jsVal(d.name||'ongai flow.')},
@@ -1199,19 +1232,99 @@ ${team}
   },
 };
 
-/* Admin overrides */
 try {
   const _saved = localStorage.getItem('ongai_content');
-  if (_saved) { const _o = JSON.parse(_saved); Object.keys(_o).forEach(k => { SITE[k] = _o[k]; }); }
+  if (_saved) { const _o = JSON.parse(_saved); Object.keys(_o).forEach(function(k){ SITE[k] = _o[k]; }); }
 } catch(e) {}
 `;
+}
 
+function exportConfig() {
+  saveAll();
+  const out = generateConfigContent();
   const blob = new Blob([out], { type: 'text/javascript' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'config.js';
   a.click();
   showToast('config.js downloaded!');
+}
+
+/* ── GitHub settings ── */
+const GH_KEY = 'ongai_gh_config';
+function loadGhConfig() {
+  try {
+    const c = JSON.parse(localStorage.getItem(GH_KEY) || '{}');
+    document.getElementById('gh-token').value  = c.token  || '';
+    document.getElementById('gh-owner').value  = c.owner  || 'ongaiflow-beep';
+    document.getElementById('gh-repo').value   = c.repo   || 'Ongai-beep';
+    document.getElementById('gh-branch').value = c.branch || 'main';
+  } catch(e) {}
+}
+function saveGhConfig() {
+  localStorage.setItem(GH_KEY, JSON.stringify({
+    token:  document.getElementById('gh-token').value.trim(),
+    owner:  document.getElementById('gh-owner').value.trim(),
+    repo:   document.getElementById('gh-repo').value.trim(),
+    branch: document.getElementById('gh-branch').value.trim(),
+  }));
+}
+
+async function publishToGitHub() {
+  saveAll();
+  const c      = JSON.parse(localStorage.getItem(GH_KEY) || '{}');
+  const token  = c.token  || '';
+  const owner  = c.owner  || 'ongaiflow-beep';
+  const repo   = c.repo   || 'Ongai-beep';
+  const branch = c.branch || 'main';
+  const ghMsg  = document.getElementById('gh-msg');
+
+  if (!token) {
+    showTab('security');
+    setTimeout(() => document.getElementById('gh-token').focus(), 50);
+    showToast('Add your GitHub token first (Password & Security tab)');
+    return;
+  }
+
+  const btn = document.getElementById('btn-publish');
+  btn.disabled = true;
+  btn.textContent = 'Publishing…';
+
+  const setGhMsg = (txt, ok) => {
+    ghMsg.textContent = txt;
+    ghMsg.style.color = ok ? '#1a7f3c' : '#c93030';
+    ghMsg.style.display = 'block';
+  };
+
+  try {
+    const content = generateConfigContent();
+    const encoded = btoa(unescape(encodeURIComponent(content)));
+    const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+    const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/config.js`;
+
+    const getRes = await fetch(`${apiBase}?ref=${branch}`, { headers });
+    if (!getRes.ok) throw new Error(`Could not read file (${getRes.status}). Check owner/repo/branch.`);
+    const { sha } = await getRes.json();
+
+    const putRes = await fetch(apiBase, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({ message: 'Update site content via admin panel', content: encoded, sha, branch }),
+    });
+    if (!putRes.ok) {
+      const body = await putRes.json().catch(() => ({}));
+      throw new Error(body.message || `GitHub error ${putRes.status}`);
+    }
+
+    setGhMsg('Published! Your site will update in ~1 minute.', true);
+    showToast('Published to GitHub!');
+  } catch (err) {
+    setGhMsg('Error: ' + err.message, false);
+    showToast('Publish failed — see Security tab for details');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Publish live';
+  }
 }
 
 /* ── Utility ── */
