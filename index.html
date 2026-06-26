@@ -783,7 +783,8 @@
   const themedSections = document.querySelectorAll('[data-nav-theme]');
   let lastScrollY = 0;
   let ticking = false;
-  let navHidden = true;
+  let navVisible = false;
+  let wasInHero = true;
 
   function getTheme() {
     const top = window.scrollY + 80;
@@ -799,29 +800,31 @@
     const y = window.scrollY;
     const diff = y - lastScrollY;
     const theme = getTheme();
+    const heroH = mhEl ? mhEl.offsetHeight : window.innerHeight;
+    const inHero = y < heroH;
 
     nav.setAttribute('data-theme', theme);
     nav.classList.remove('scrolled-light', 'scrolled-dark');
     if (y > 80) nav.classList.add(theme === 'dark' ? 'scrolled-dark' : 'scrolled-light');
 
-    const heroH = mhEl ? mhEl.offsetHeight : window.innerHeight;
-    if (y < heroH) {
-      // Inside hero — keep hidden
+    if (inHero) {
       nav.style.transform = 'translateY(-100%)';
-      navHidden = true;
-    } else if (navHidden) {
-      // Just crossed past hero — always show
+      navVisible = false;
+    } else if (wasInHero) {
+      // Just exited hero scrolling down — show nav once
       nav.style.transform = 'translateY(0)';
-      navHidden = false;
-    } else if (diff > 8) {
+      navVisible = true;
+    } else if (diff > 8 && navVisible) {
       // Scrolling down — hide
       nav.style.transform = 'translateY(-100%)';
-      navHidden = true;
-    } else if (diff < -8) {
+      navVisible = false;
+    } else if (diff < -8 && !navVisible) {
       // Scrolling up — show
       nav.style.transform = 'translateY(0)';
-      navHidden = false;
+      navVisible = true;
     }
+
+    wasInHero = inHero;
     lastScrollY = y;
     ticking = false;
   }
