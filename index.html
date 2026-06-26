@@ -313,7 +313,9 @@
     </div>
 
     <div id="mh-arc" style="position:absolute;top:20%;left:0;right:0;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none;padding:2rem;opacity:0;">
-      <p style="font-family:var(--font-body);color:var(--y);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.25rem;">selected work</p>
+      <div id="arc-logo" style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:center;">
+        <!-- filled by JS with uploaded logo or default SVG mark -->
+      </div>
       <h2 class="h-section" style="color:var(--dk);">our <span style="color:var(--y);">work.</span></h2>
       <p style="font-family:var(--font-body);color:rgba(20,17,5,.52);font-size:1rem;max-width:460px;line-height:1.75;margin-top:1.25rem;">A selection of brands we've shaped — identities built to last, and stories designed to be remembered.</p>
     </div>
@@ -717,6 +719,16 @@
       img.setAttribute('aria-hidden', 'false');
       img.style.cssText = 'height:32px;width:auto;object-fit:contain;display:block;';
       lm.parentNode.replaceChild(img, lm);
+    }
+  }
+
+  /* ── Arc overlay logo ── */
+  var arcLogo = document.getElementById('arc-logo');
+  if (arcLogo) {
+    if (SITE.logo && SITE.logo.image) {
+      arcLogo.innerHTML = '<img src="' + SITE.logo.image + '" alt="Ongai Flow" style="height:36px;width:auto;object-fit:contain;display:block;">';
+    } else {
+      arcLogo.innerHTML = '<svg width="52" height="34" viewBox="0 0 42 28" fill="none" aria-hidden="true"><circle cx="14" cy="14" r="10" stroke="#DAED00" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="#DAED00" stroke-width="2.5" stroke-linecap="round"/></svg>';
     }
   }
 
