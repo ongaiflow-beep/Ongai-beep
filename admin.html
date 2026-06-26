@@ -421,7 +421,7 @@
           </div>
           <div class="form-group" style="flex:0 0 120px">
             <label class="form-label">Branch</label>
-            <input id="gh-branch" class="form-input" value="main" oninput="saveGhConfig()">
+            <input id="gh-branch" class="form-input" value="cloudflare/workers-autoconfig" oninput="saveGhConfig()">
           </div>
         </div>
         <div id="gh-msg" style="font-size:.82rem;margin-top:.25rem;display:none;"></div>
@@ -1258,7 +1258,7 @@ function loadGhConfig() {
     document.getElementById('gh-token').value  = c.token  || '';
     document.getElementById('gh-owner').value  = c.owner  || 'ongaiflow-beep';
     document.getElementById('gh-repo').value   = c.repo   || 'Ongai-beep';
-    document.getElementById('gh-branch').value = c.branch || 'main';
+    document.getElementById('gh-branch').value = c.branch || 'cloudflare/workers-autoconfig';
   } catch(e) {}
 }
 function saveGhConfig() {
@@ -1276,7 +1276,7 @@ async function publishToGitHub() {
   const token  = c.token  || '';
   const owner  = c.owner  || 'ongaiflow-beep';
   const repo   = c.repo   || 'Ongai-beep';
-  const branch = c.branch || 'main';
+  const branch = c.branch || 'cloudflare/workers-autoconfig';
   const ghMsg  = document.getElementById('gh-msg');
 
   if (!token) {
