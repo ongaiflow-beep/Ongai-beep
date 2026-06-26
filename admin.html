@@ -24,6 +24,11 @@
     .login-label{display:block;font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:.5rem;letter-spacing:.04em;text-transform:uppercase;}
     .login-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--wh);font-size:.95rem;font-family:var(--font);padding:.75rem 1rem;outline:none;transition:border-color .2s;}
     .login-input:focus{border-color:var(--y);}
+    .login-input:-webkit-autofill,.login-input:-webkit-autofill:hover,.login-input:-webkit-autofill:focus{
+      -webkit-box-shadow:0 0 0 1000px #1a1803 inset !important;
+      -webkit-text-fill-color:#fff !important;
+      caret-color:#fff; transition:background-color 9999s ease;
+    }
     .login-btn{width:100%;margin-top:1.75rem;background:var(--y);color:var(--dk);font-family:var(--font);font-weight:700;font-size:.95rem;border:none;border-radius:7px;padding:.85rem;cursor:pointer;transition:background .2s;}
     .login-btn:hover{background:#c9db00;}
     .login-err{color:#ff6b6b;font-size:.82rem;margin-top:.75rem;display:none;}
@@ -70,8 +75,15 @@
     .form-label{display:block;font-size:.8rem;color:rgba(255,255,255,.55);margin-bottom:.5rem;}
     .form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--wh);font-size:.9rem;font-family:var(--font);padding:.65rem .875rem;outline:none;transition:border-color .2s;}
     .form-input:focus{border-color:var(--y);}
-    .form-input::placeholder{color:rgba(255,255,255,.2);}
+    .form-input::placeholder{color:rgba(255,255,255,.35);}
     textarea.form-input{resize:vertical;min-height:90px;line-height:1.55;}
+    input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,select:-webkit-autofill{
+      -webkit-box-shadow:0 0 0 1000px #1a1803 inset !important;
+      -webkit-text-fill-color:#fff !important;
+      caret-color:#fff;
+      transition:background-color 9999s ease;
+    }
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
     .form-hint{font-size:.75rem;color:rgba(255,255,255,.25);margin-top:.35rem;line-height:1.5;}
     .form-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1rem;position:relative;}

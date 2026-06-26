@@ -22,8 +22,9 @@
     body{font-family:var(--font-body);background:var(--wh);color:var(--dk);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
     .text-y{color:var(--y);}
     .px-site{padding-left:clamp(1.5rem,5vw,4rem);padding-right:clamp(1.5rem,5vw,4rem);}
-    .h-hero{font-family:var(--font-display);font-weight:900;font-size:clamp(3rem,6vw,7.5rem);line-height:.92;letter-spacing:-.02em;text-transform:uppercase;}
-    .h-xl{font-family:var(--font-display);font-weight:900;font-size:clamp(2.8rem,8vw,9rem);line-height:.9;text-transform:uppercase;}
+    .h-hero{font-family:var(--font-display);font-weight:900;font-size:clamp(3rem,6vw,7.5rem);line-height:.92;letter-spacing:-.02em;}
+    .h-xl{font-family:var(--font-display);font-weight:900;font-size:clamp(1.9rem,4.5vw,5rem);line-height:.95;}
+    input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,textarea:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px var(--dk) inset !important;-webkit-text-fill-color:#fff !important;caret-color:#fff;transition:background-color 9999s ease;}
     ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--y);border-radius:4px;}
 
     /* Nav (same across all pages) */
@@ -44,7 +45,7 @@
     #ham[aria-expanded="true"] #hl3{transform:translateY(-6px) rotate(-45deg);}
     #mob-menu{position:fixed;inset:0;z-index:45;background:var(--dk);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;opacity:0;pointer-events:none;transition:opacity .3s ease;}
     #mob-menu.open{opacity:1;pointer-events:all;}
-    .mob-link{font-family:var(--font-display);font-weight:900;font-size:clamp(2.2rem,8vw,3.5rem);text-transform:uppercase;color:rgba(255,255,255,.6);transition:color .2s ease;}
+    .mob-link{font-family:var(--font-display);font-weight:900;font-size:clamp(2.2rem,8vw,3.5rem);color:rgba(255,255,255,.6);transition:color .2s ease;}
     .mob-link:hover{color:var(--y);}
 
     /* Service list */
@@ -53,9 +54,9 @@
     .svc-item{padding:3rem 2.5rem;border-bottom:1px solid rgba(20,17,5,.07);border-right:1px solid rgba(20,17,5,.07);transition:background .22s ease;}
     .svc-item:hover{background:var(--y);}
     .svc-item:hover .svc-n,.svc-item:hover .svc-t,.svc-item:hover .svc-d,.svc-item:hover .svc-arr{color:var(--dk);}
-    .svc-n{font-family:var(--font-body);color:rgba(20,17,5,.25);font-size:.68rem;letter-spacing:.12em;transition:color .22s ease;margin-bottom:1.5rem;}
+    .svc-n{font-family:var(--font-body);color:#bbb;font-size:.68rem;letter-spacing:.12em;transition:color .22s ease;margin-bottom:1.5rem;}
     .svc-t{font-family:var(--font-display);font-weight:900;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--dk);line-height:1.1;margin-bottom:1rem;transition:color .22s ease;}
-    .svc-d{font-family:var(--font-body);color:rgba(20,17,5,.5);font-size:.9rem;line-height:1.7;max-width:360px;transition:color .22s ease;}
+    .svc-d{font-family:var(--font-body);color:#666;font-size:.9rem;line-height:1.7;max-width:360px;transition:color .22s ease;}
     .svc-arr{color:rgba(20,17,5,.2);font-size:1.2rem;margin-top:2rem;display:inline-block;transition:color .22s ease,transform .22s ease;}
     .svc-item:hover .svc-arr{transform:translateX(4px);}
 
@@ -88,6 +89,7 @@
     </svg>
   </a>
   <div class="hidden md:flex items-center" style="gap:2.25rem;">
+    <a href="index.html"    class="nav-link">Home</a>
     <a href="work.html"     class="nav-link">Work</a>
     <a href="services.html" class="nav-link active">Services</a>
     <a href="about.html"    class="nav-link">About</a>
@@ -101,6 +103,7 @@
 </nav>
 
 <div id="mob-menu" role="dialog" aria-modal="true">
+  <a href="index.html"    class="mob-link">Home</a>
   <a href="work.html"     class="mob-link">Work</a>
   <a href="services.html" class="mob-link">Services</a>
   <a href="about.html"    class="mob-link">About</a>
@@ -146,7 +149,7 @@
   <section data-nav-theme="light" style="background:#f7f7f5;padding:6rem 0;">
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
       <div class="reveal" style="margin-bottom:4rem;">
-        <span style="font-family:var(--font-body);color:rgba(20,17,5,.3);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;">how we work</span>
+        <span style="font-family:var(--font-body);color:#aaa;font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;">how we work</span>
         <h2 style="font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);color:var(--dk);line-height:1.05;margin-top:1.25rem;">branding. effectively,<br><em>not</em> aesthetic.</h2>
       </div>
       <div style="display:grid;gap:2.5rem;" id="process">
