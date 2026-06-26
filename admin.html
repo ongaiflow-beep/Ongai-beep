@@ -808,12 +808,11 @@ function renderWork(list) {
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">Gallery images</label>
-            <div class="img-upload-row" style="margin-bottom:.5rem;">
+            <div class="img-upload-row">
               <button class="img-btn" type="button" onclick="document.getElementById('w-gfiles-${i}').click()">Upload images</button>
-              <span class="form-hint" style="margin:0;">or paste URLs below, one per line</span>
             </div>
             <input type="file" id="w-gfiles-${i}" accept="image/*" multiple onchange="handleGalleryImgs(this, ${i})">
-            <textarea id="w-images-${i}" class="form-input" rows="3" placeholder="https://example.com/img1.jpg&#10;https://example.com/img2.jpg">${esc((w.images||[]).join('\n'))}</textarea>
+            <textarea id="w-images-${i}" style="display:none;">${esc((w.images||[]).join('\n'))}</textarea>
             <div id="w-gprev-${i}" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;">${galleryPrevs}</div>
           </div>
           <div class="form-group" style="margin-bottom:0;">
