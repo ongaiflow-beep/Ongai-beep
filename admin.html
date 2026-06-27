@@ -430,6 +430,20 @@
             <input id="gh-branch" class="form-input" value="cloudflare/workers-autoconfig" oninput="saveGhConfig()">
           </div>
         </div>
+        <div class="divider" style="margin:1.5rem 0 1.25rem;"></div>
+        <p class="section-title">Image Upload (Cloudflare R2)</p>
+        <div class="cred-info">
+          Connect a Cloudflare Worker to store images in R2 instead of the browser. Images will be served from a global CDN with permanent public URLs.
+        </div>
+        <div class="form-group">
+          <label class="form-label">Worker URL</label>
+          <input type="url" id="gh-worker-url" class="form-input" placeholder="https://ongai-upload.yourname.workers.dev/upload" oninput="saveGhConfig()">
+          <p class="form-hint">The deployed Worker endpoint. Leave empty to fall back to local data URLs.</p>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Upload Secret</label>
+          <input type="password" id="gh-upload-secret" class="form-input" placeholder="your-upload-secret" oninput="saveGhConfig()">
+        </div>
         <div id="gh-msg" style="font-size:.82rem;margin-top:.25rem;display:none;"></div>
       </div>
 
@@ -698,12 +712,10 @@ function collectClients() {
 
 async function handleClientLogo(input, i) {
   if (!input.files[0]) return;
-  const file = input.files[0];
-  const dataURL = file.type === 'image/svg+xml'
-    ? await new Promise(function(r){ const fr=new FileReader(); fr.onload=function(e){r(e.target.result);}; fr.readAsDataURL(file); })
-    : await compressImage(file, 380, 190, 0.82, 'image/png');
-  const prev = document.getElementById(`cl-prev-${i}`);
-  prev.innerHTML = `<img src="${dataURL}">`;
+  try {
+    const url = await uploadImage(input.files[0], 380, 190, 0.82, 'image/png');
+    document.getElementById(`cl-prev-${i}`).innerHTML = `<img src="${url}">`;
+  } catch(e) {}
 }
 
 /* ══════════════════════════════
@@ -945,10 +957,11 @@ function collectWork() {
 
 async function handleWorkImg(input, i) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 800, 530, 0.6);
-  const prev = document.getElementById(`w-prev-${i}`);
-  prev.innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;">`;
-  document.getElementById(`w-img-${i}`).value = dataURL;
+  try {
+    const url = await uploadImage(input.files[0], 800, 530, 0.6);
+    document.getElementById(`w-prev-${i}`).innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById(`w-img-${i}`).value = url;
+  } catch(e) {}
 }
 
 function updateWorkImgPreview(input, i) {
@@ -963,13 +976,15 @@ async function handleGalleryImgs(input, i) {
   const ta   = document.getElementById(`w-images-${i}`);
   const prev = document.getElementById(`w-gprev-${i}`);
   for (const file of Array.from(input.files)) {
-    const dataURL = await compressImage(file, 1200, 800, 0.72);
-    const existing = ta.value.trim();
-    ta.value = existing ? existing + '\n' + dataURL : dataURL;
-    const thumb = document.createElement('div');
-    thumb.style.cssText = 'width:56px;height:40px;border-radius:5px;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,0,0,.1);';
-    thumb.innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;">`;
-    prev.appendChild(thumb);
+    try {
+      const url = await uploadImage(file, 1200, 800, 0.72);
+      const existing = ta.value.trim();
+      ta.value = existing ? existing + '\n' + url : url;
+      const thumb = document.createElement('div');
+      thumb.style.cssText = 'width:56px;height:40px;border-radius:5px;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,0,0,.1);';
+      thumb.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+      prev.appendChild(thumb);
+    } catch(e) {}
   }
   input.value = '';
 }
@@ -1065,9 +1080,10 @@ function collectTeam() {
 
 async function handleTeamMemberPhoto(input, i) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 280, 280, 0.7);
-  const prev = document.getElementById(`tm-prev-${i}`);
-  prev.innerHTML = `<img src="${dataURL}">`;
+  try {
+    const url = await uploadImage(input.files[0], 280, 280, 0.7);
+    document.getElementById(`tm-prev-${i}`).innerHTML = `<img src="${url}">`;
+  } catch(e) {}
 }
 
 /* ══════════════════════════════
@@ -1100,15 +1116,91 @@ function compressImage(file, maxW, maxH, quality, format) {
 }
 
 /* ══════════════════════════════
+   R2 IMAGE UPLOAD
+══════════════════════════════ */
+function compressToBlob(file, maxW, maxH, quality, format) {
+  var fmt = format || (file.type === 'image/png' ? 'image/png' : 'image/jpeg');
+  return new Promise(function(resolve, reject) {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = function() {
+        let w = img.width, h = img.height;
+        if (w > maxW || h > maxH) {
+          const ratio = Math.min(maxW / w, maxH / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+        if (fmt === 'image/png') ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        c.toBlob(function(blob) {
+          blob ? resolve(blob) : reject(new Error('Canvas export failed'));
+        }, fmt, quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadImage(file, maxW, maxH, quality, format) {
+  const cfg = JSON.parse(localStorage.getItem(GH_KEY) || '{}');
+  const workerUrl    = cfg.workerUrl    || '';
+  const uploadSecret = cfg.uploadSecret || '';
+
+  if (workerUrl && uploadSecret) {
+    showToast('Uploading image…');
+    let blob, filename;
+    if (file.type === 'image/svg+xml') {
+      blob = file;
+      filename = file.name || 'image.svg';
+    } else {
+      var fmt = format || (file.type === 'image/png' ? 'image/png' : 'image/jpeg');
+      blob = await compressToBlob(file, maxW, maxH, quality, fmt);
+      filename = 'image.' + (fmt === 'image/png' ? 'png' : 'jpg');
+    }
+    const fd = new FormData();
+    fd.append('file', new File([blob], filename, { type: blob.type || file.type }));
+    const res = await fetch(workerUrl, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + uploadSecret },
+      body: fd,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const msg = (err.error || 'Upload failed (' + res.status + ')');
+      showToast(msg, 5000);
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    return data.url;
+  }
+
+  // Fallback: compress to local data URL (no Worker configured)
+  if (file.type === 'image/svg+xml') {
+    return new Promise(function(r) {
+      const fr = new FileReader();
+      fr.onload = function(e) { r(e.target.result); };
+      fr.readAsDataURL(file);
+    });
+  }
+  return compressImage(file, maxW, maxH, quality, format);
+}
+
+/* ══════════════════════════════
    LOGO
 ══════════════════════════════ */
 async function handleLogoUpload(input) {
   if (!input.files[0]) return;
-  const file = input.files[0];
-  const dataURL = file.type === 'image/svg+xml'
-    ? await new Promise(function(r){ const fr=new FileReader(); fr.onload=function(e){r(e.target.result);}; fr.readAsDataURL(file); })
-    : await compressImage(file, 300, 150, 0.82, 'image/png');
-  document.getElementById('logo-preview').innerHTML = `<img src="${dataURL}">`;
+  try {
+    const url = await uploadImage(input.files[0], 300, 150, 0.82, 'image/png');
+    document.getElementById('logo-preview').innerHTML = `<img src="${url}">`;
+  } catch(e) {}
 }
 
 function clearLogo() {
@@ -1120,8 +1212,10 @@ function clearLogo() {
 ══════════════════════════════ */
 async function handleTeamPhotoUpload(input) {
   if (!input.files[0]) return;
-  const dataURL = await compressImage(input.files[0], 800, 530, 0.62);
-  document.getElementById('team-photo-preview').innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;">`;
+  try {
+    const url = await uploadImage(input.files[0], 800, 530, 0.62);
+    document.getElementById('team-photo-preview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  } catch(e) {}
 }
 
 function clearTeamPhoto() {
@@ -1264,8 +1358,10 @@ function loadGhConfig() {
     document.getElementById('gh-token').value      = c.token     || '';
     document.getElementById('gh-owner').value      = c.owner     || 'ongaiflow-beep';
     document.getElementById('gh-repo').value       = c.repo      || 'Ongai-beep';
-    document.getElementById('gh-src-branch').value = c.srcBranch || 'claude/jolly-curie-rogsjn';
-    document.getElementById('gh-branch').value     = c.branch    || 'cloudflare/workers-autoconfig';
+    document.getElementById('gh-src-branch').value   = c.srcBranch    || 'claude/jolly-curie-rogsjn';
+    document.getElementById('gh-branch').value        = c.branch       || 'cloudflare/workers-autoconfig';
+    document.getElementById('gh-worker-url').value    = c.workerUrl    || '';
+    document.getElementById('gh-upload-secret').value = c.uploadSecret || '';
   } catch(e) {}
 }
 function saveGhConfig() {
@@ -1273,8 +1369,10 @@ function saveGhConfig() {
     token:     document.getElementById('gh-token').value.trim(),
     owner:     document.getElementById('gh-owner').value.trim(),
     repo:      document.getElementById('gh-repo').value.trim(),
-    srcBranch: document.getElementById('gh-src-branch').value.trim(),
-    branch:    document.getElementById('gh-branch').value.trim(),
+    srcBranch:    document.getElementById('gh-src-branch').value.trim(),
+    branch:       document.getElementById('gh-branch').value.trim(),
+    workerUrl:    document.getElementById('gh-worker-url').value.trim(),
+    uploadSecret: document.getElementById('gh-upload-secret').value.trim(),
   }));
 }
 

@@ -1,0 +1,23 @@
+name = "ongai-upload"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# Public R2 URL shown in browser (no trailing slash)
+[vars]
+PUBLIC_R2_URL = "https://pub-7e7b6ae30ea24fc19e510c2643555b66.r2.dev"
+
+# R2 bucket binding — native access, no S3 keys needed in code
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "ongaiflow"
+
+# ── Setup steps ───────────────────────────────────────────────
+# 1. npm install
+# 2. npx wrangler login
+# 3. npx wrangler deploy
+# 4. Set the upload secret (never commit this):
+#    npx wrangler secret put UPLOAD_SECRET
+#    → choose a long random string, e.g. output of:
+#      node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# 5. Copy the deployed worker URL into Admin → Password & Security → Worker URL
+# 6. Enter the same secret in Admin → Upload Secret
