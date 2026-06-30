@@ -461,6 +461,7 @@
    Password: OngaiFlow@2025
 ══════════════════════════════════════════════════ */
 const CREDS_KEY = 'ongai_admin_creds';
+const STORE_KEY = 'ongai_content';
 
 function getCredentials() {
   const stored = localStorage.getItem(CREDS_KEY);
@@ -510,6 +511,15 @@ document.getElementById('logout-btn').addEventListener('click', function() {
   document.getElementById('li-err').style.display = 'none';
 });
 
+/* ── Show the uploaded logo on the login screen, even before signing in ── */
+(function applyLoginLogo() {
+  const d = getData();
+  const logoImg = d.logo && d.logo.image;
+  if (logoImg) {
+    document.getElementById('admin-login-mark').innerHTML = `<img src="${logoImg}" style="height:28px;width:auto;max-width:140px;object-fit:contain;display:block;" alt="Ongai Flow logo">`;
+  }
+})();
+
 /* ── Init ── */
 if (isLoggedIn()) {
   document.getElementById('login-screen').style.display = 'none';
@@ -529,8 +539,6 @@ function showTab(name) {
 }
 
 /* ── Data ── */
-const STORE_KEY = 'ongai_content';
-
 function getData() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
