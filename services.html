@@ -51,7 +51,7 @@
     /* Service list */
     .svc-row{display:grid;gap:0;border-top:1px solid rgba(20,17,5,.07);border-left:1px solid rgba(20,17,5,.07);}
     @media(min-width:768px){.svc-row{grid-template-columns:1fr 1fr;}}
-    .svc-item{padding:3rem 2.5rem;border-bottom:1px solid rgba(20,17,5,.07);border-right:1px solid rgba(20,17,5,.07);transition:background .22s ease;}
+    .svc-item{display:block;padding:3rem 2.5rem;border-bottom:1px solid rgba(20,17,5,.07);border-right:1px solid rgba(20,17,5,.07);transition:background .22s ease;cursor:pointer;}
     .svc-item:hover{background:var(--y);}
     .svc-item:hover .svc-n,.svc-item:hover .svc-t,.svc-item:hover .svc-d,.svc-item:hover .svc-arr{color:var(--dk);}
     .svc-n{font-family:var(--font-body);color:rgba(20,17,5,.3);font-size:.68rem;letter-spacing:.12em;transition:color .22s ease;margin-bottom:1.5rem;}
@@ -62,7 +62,7 @@
 
     /* Contact */
     .field{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.15);color:var(--wh);font-family:var(--font-body);font-size:1rem;padding:.875rem 0;outline:none;transition:border-color .2s ease;-webkit-appearance:none;}
-    .field::placeholder{color:rgba(255,255,255,.3);}
+    .field::placeholder{color:rgba(255,255,255,.65);}
     .field:focus{border-bottom-color:var(--y);}
     select.field option{background:var(--dk);}
     .btn-send{display:inline-flex;align-items:center;gap:.6rem;background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;font-size:.95rem;padding:.875rem 2rem;border-radius:9999px;border:none;cursor:pointer;transition:background .2s ease;margin-top:.5rem;}
@@ -125,7 +125,7 @@
   </section>
 
   <!-- Services grid -->
-  <section data-nav-theme="light" style="background:var(--wh);padding:0 0 5rem;">
+  <section data-nav-theme="light" style="background:var(--wh);padding:0;">
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
       <div class="svc-row" id="svc-full"></div>
       <script>
@@ -133,12 +133,12 @@
         const el=document.getElementById('svc-full');
         SITE.services.forEach(function(s,i){
           el.innerHTML+=`
-          <div class="svc-item reveal">
+          <a href="service.html?i=${i}" class="svc-item reveal">
             <div class="svc-n">0${i+1}</div>
             <h2 class="svc-t">${s.title}</h2>
             <p class="svc-d">${s.desc}</p>
             <span class="svc-arr">→</span>
-          </div>`;
+          </a>`;
         });
       })();
       </script>

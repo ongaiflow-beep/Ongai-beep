@@ -133,8 +133,9 @@
 
     /* ── Service cards ── */
     .svc-card {
+      display: block;
       padding: 2.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,.08);
-      cursor: default; transition: background .22s ease, padding-left .22s ease;
+      cursor: pointer; transition: background .22s ease, padding-left .22s ease;
     }
     .svc-card:hover { background: var(--y); padding-left: 2.5rem; }
     .svc-card:hover .svc-title,
@@ -548,14 +549,14 @@
         const el = document.getElementById('svc-preview');
         SITE.services.slice(0,4).forEach((s,i) => {
           el.innerHTML += `
-          <div class="svc-card">
+          <a href="service.html?i=${i}" class="svc-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
               <span class="svc-num">0${i+1}</span>
               <span class="svc-arrow">→</span>
             </div>
             <h3 class="svc-title" style="margin-bottom:.6rem;">${s.title}</h3>
             <p class="svc-desc">${s.desc}</p>
-          </div>`;
+          </a>`;
         });
       })();
       </script>

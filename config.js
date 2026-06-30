@@ -53,15 +53,21 @@ const SITE = {
     { name: 'Client 06', image: '' },
   ],
 
-  /* ── SERVICES ─────────────────────────── */
+  /* ── SERVICES ────────────────────────────
+     • image: hero picture for the service's own page,
+       e.g. 'assets/services/identity.jpg'
+       Leave empty to show a branded placeholder.
+  ─────────────────────────────────────────── */
   services: [
     {
       title: 'Visual Identity',
       desc: 'A complete visual system — color, type, and layout — that says who you are without a word.',
+      image: '',
     },
     {
       title: 'Brand Strategy',
       desc: 'We flow to the core — identifying the real brand problem and building the right solution.',
+      image: '',
     },
   ],
 

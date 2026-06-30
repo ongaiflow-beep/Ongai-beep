@@ -743,9 +743,19 @@ function renderServices(list) {
         <label class="form-label">Service title</label>
         <input id="svc-title-${i}" class="form-input" type="text" value="${esc(s.title||'')}">
       </div>
-      <div class="form-group" style="margin-bottom:0;">
+      <div class="form-group">
         <label class="form-label">Description</label>
         <textarea id="svc-desc-${i}" class="form-input" rows="2">${esc(s.desc||'')}</textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Hero image <span style="color:rgba(20,17,5,.35);font-weight:400;">— shown on this service's own page</span></label>
+        <div class="img-upload-row">
+          <div class="img-preview" id="svc-prev-${i}" style="width:100px;height:65px;">
+            ${s.image ? `<img src="${s.image}" style="width:100%;height:100%;object-fit:cover;">` : '<svg width="18" height="12" viewBox="0 0 20 14" fill="none"><rect x="1" y="1" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5" opacity=".3"/></svg>'}
+          </div>
+          <button class="img-btn" onclick="document.getElementById('svc-file-${i}').click()">Upload image</button>
+        </div>
+        <input type="file" id="svc-file-${i}" accept="image/*" onchange="handleServiceImg(this, ${i})">
       </div>
     </div>`;
   });
@@ -753,7 +763,7 @@ function renderServices(list) {
 
 function addService() {
   const list = collectServices();
-  list.push({ title: 'New Service', desc: 'Description of the service.' });
+  list.push({ title: 'New Service', desc: 'Description of the service.', image: '' });
   renderServices(list);
 }
 
@@ -765,10 +775,22 @@ function removeService(i) {
 
 function collectServices() {
   const cards = document.querySelectorAll('[id^="svc-card-"]');
-  return Array.from(cards).map((_, i) => ({
-    title: document.getElementById(`svc-title-${i}`).value.trim(),
-    desc:  document.getElementById(`svc-desc-${i}`).value.trim(),
-  }));
+  return Array.from(cards).map((_, i) => {
+    const img = document.querySelector(`#svc-prev-${i} img`);
+    return {
+      title: document.getElementById(`svc-title-${i}`).value.trim(),
+      desc:  document.getElementById(`svc-desc-${i}`).value.trim(),
+      image: img ? img.src : '',
+    };
+  });
+}
+
+async function handleServiceImg(input, i) {
+  if (!input.files[0]) return;
+  try {
+    const url = await uploadImage(input.files[0], 1200, 800, 0.7);
+    document.getElementById(`svc-prev-${i}`).innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  } catch(e) {}
 }
 
 /* ══════════════════════════════
@@ -1290,7 +1312,7 @@ function generateConfigContent() {
     return JSON.stringify(v);
   }
 
-  const services = (d.services||[]).map(s => `    { title: ${jsVal(s.title)}, desc: ${jsVal(s.desc)} },`).join('\n');
+  const services = (d.services||[]).map(s => `    { title: ${jsVal(s.title)}, desc: ${jsVal(s.desc)}, image: ${jsVal(s.image||'')} },`).join('\n');
   const work = (d.work||[]).map(w => {
     const svcs = (w.services||[]).map(s => jsVal(s)).join(', ');
     const imgs = (w.images||[]).map(s => jsVal(s)).join(', ');
