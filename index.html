@@ -340,6 +340,9 @@
 
   <script>
   (function(){
+    /* Start the intro from the top every load (don't restore a scrolled position) */
+    if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
+    window.scrollTo(0,0);
     var TARGET=14, N=TARGET, W=100, H=140, MAX=1500;
     /* Build exactly 14 slots: real project images first, null for empty slots */
     var IMGS=(function(){
@@ -455,7 +458,7 @@
     function releaseScrLock(){document.body.style.overflow='';scrLocked=false;window.dispatchEvent(new Event('scroll'));}
 
     function onWheel(e){
-      if(!capScr) return;
+      if(!capScr){ if(scrLocked) e.preventDefault(); return; }
       var rect=sec.getBoundingClientRect();
       if(rect.top>10||rect.top<-60){if(scrLocked)releaseScrLock();return;}
       if(virScr>=MAX&&e.deltaY>0){if(scrLocked)releaseScrLock();return;}
@@ -469,7 +472,7 @@
     var ty0=0;
     function onTS(e){if(capScr) ty0=e.touches[0].clientY;}
     function onTM(e){
-      if(!capScr) return;
+      if(!capScr){ if(scrLocked) e.preventDefault(); return; }
       var rect=sec.getBoundingClientRect();
       if(rect.top>10||rect.top<-60){if(scrLocked)releaseScrLock();return;}
       var dy=ty0-e.touches[0].clientY; ty0=e.touches[0].clientY;
@@ -490,6 +493,7 @@
     function updSz(){cw=sec.offsetWidth;ch=sec.offsetHeight;}
 
     updSz(); mkCards();
+    acquireScrLock();               /* lock scrolling during the intro animation */
     setTimeout(function(){phase='line';},500);
     setTimeout(function(){
       phase='circle'; capScr=true;
