@@ -57,7 +57,7 @@
     .work-cell-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
     .work-cell:hover .work-cell-img img{transform:scale(1.04);}
     .wc-cat{font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:.6rem;transition:color .22s ease;}
-    .wc-title{font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:clamp(1.4rem,2.5vw,2rem);line-height:1.05;transition:color .22s ease;}
+    .wc-title{font-family:var(--font-body);font-weight:400;color:var(--dk);font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.15;transition:color .22s ease;}
     .wc-view{font-family:var(--font-body);color:rgba(20,17,5,.4);font-weight:600;font-size:.8rem;margin-top:1rem;display:inline-block;transition:color .22s ease,transform .22s ease;}
     .work-cell:hover .wc-cat,.work-cell:hover .wc-view{color:var(--dk);}
     .work-cell:hover .wc-view{transform:translateX(4px);}
@@ -67,6 +67,7 @@
     .field::placeholder{color:rgba(255,255,255,.65);}
     .field:focus{border-bottom-color:var(--y);}
     select.field option{background:var(--dk);}
+    select.field:has(option[value=""]:checked){color:rgba(255,255,255,.65);}
     .btn-send{display:inline-flex;align-items:center;gap:.6rem;background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;font-size:.95rem;padding:.875rem 2rem;border-radius:9999px;border:none;cursor:pointer;transition:background .2s ease;margin-top:.5rem;}
     .btn-send:hover:not(:disabled){background:var(--wh);}
     .btn-send:disabled{opacity:.6;cursor:wait;}

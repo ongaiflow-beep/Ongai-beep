@@ -65,6 +65,7 @@
     .field::placeholder{color:rgba(255,255,255,.65);}
     .field:focus{border-bottom-color:var(--y);}
     select.field option{background:var(--dk);}
+    select.field:has(option[value=""]:checked){color:rgba(255,255,255,.65);}
     .btn-send{display:inline-flex;align-items:center;gap:.6rem;background:var(--y);color:var(--dk);font-family:var(--font-body);font-weight:700;font-size:.95rem;padding:.875rem 2rem;border-radius:9999px;border:none;cursor:pointer;transition:background .2s ease;margin-top:.5rem;}
     .btn-send:hover:not(:disabled){background:var(--wh);}
     .btn-send:disabled{opacity:.6;cursor:wait;}
