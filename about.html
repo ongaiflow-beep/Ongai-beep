@@ -68,6 +68,18 @@
     .lead{font-family:var(--font-body);font-weight:400;font-size:clamp(1.3rem,2vw,1.75rem);line-height:1.55;color:rgba(20,17,5,.82);max-width:40ch;}
     .lead .brand-em{font-weight:500;}
 
+    /* Hover-preview words (same font/background — just the hover interaction) */
+    .hover-word{position:relative;display:inline-block;color:var(--dk);font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:1px solid rgba(20,17,5,.22);transition:border-color .3s ease;}
+    .hover-word:hover{border-bottom-color:transparent;}
+    .hover-word::after{content:'';position:absolute;left:0;bottom:-1px;width:100%;height:2px;background:var(--y);transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.25,.46,.45,.94);}
+    .hover-word:hover::after{transform:scaleX(1);}
+    .hover-card{position:fixed;pointer-events:none;z-index:1000;opacity:0;transform:translateY(10px) scale(.95);transition:opacity .25s ease,transform .25s cubic-bezier(.34,1.56,.64,1);will-change:transform,opacity;}
+    .hover-card.visible{opacity:1;transform:translateY(0) scale(1);}
+    .hover-card-inner{background:var(--dk);border-radius:16px;padding:8px;box-shadow:0 25px 50px -12px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);overflow:hidden;max-width:300px;min-width:150px;}
+    .hover-card img{width:280px;height:158px;object-fit:cover;border-radius:10px;display:block;background:#000;margin-bottom:2px;}
+    .hover-card-title{padding:10px 8px 2px;font-size:.9rem;color:var(--wh);font-weight:600;font-family:var(--font-body);}
+    .hover-card-subtitle{padding:0 8px 6px;font-size:.78rem;color:rgba(255,255,255,.5);font-family:var(--font-body);line-height:1.4;}
+
     /* Values list */
     .values-list{border-top:1px solid rgba(20,17,5,.1);}
     .value-row{display:flex;align-items:baseline;gap:1.75rem;padding:1.85rem 0;border-bottom:1px solid rgba(20,17,5,.1);transition:padding-left .35s cubic-bezier(.22,1,.36,1);}
@@ -248,6 +260,71 @@
           '<p style="font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.85rem;margin-top:.2rem;">' + m.role + '</p></div>';
       });
     }
+
+    /* ── Hover-preview words in the body ── */
+    (function(){
+      var hovers = a.hovers || [];
+      if (!bEl || !hovers.length) return;
+      function escRe(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+      // Wrap the first occurrence of each configured word in the body
+      hovers.forEach(function(h){
+        if (!h.word) return;
+        var re = new RegExp(escRe(h.word), 'i');
+        var walker = document.createTreeWalker(bEl, NodeFilter.SHOW_TEXT, null);
+        var target = null, m = null;
+        while (walker.nextNode()) {
+          var n = walker.currentNode;
+          if (n.parentNode && n.parentNode.classList && n.parentNode.classList.contains('hover-word')) continue;
+          m = n.nodeValue.match(re);
+          if (m) { target = n; break; }
+        }
+        if (!target) return;
+        var full = m[0], before = target.nodeValue.slice(0, m.index), after = target.nodeValue.slice(m.index + full.length);
+        var span = document.createElement('span');
+        span.className = 'hover-word';
+        span.textContent = full;
+        span.setAttribute('data-title', h.title || '');
+        span.setAttribute('data-subtitle', h.subtitle || '');
+        span.setAttribute('data-image', h.image || '');
+        var frag = document.createDocumentFragment();
+        if (before) frag.appendChild(document.createTextNode(before));
+        frag.appendChild(span);
+        if (after) frag.appendChild(document.createTextNode(after));
+        target.parentNode.replaceChild(frag, target);
+      });
+
+      var words = bEl.querySelectorAll('.hover-word');
+      if (!words.length) return;
+      hovers.forEach(function(h){ if (h.image) { var im = new Image(); im.src = h.image; } });
+
+      var card = document.createElement('div');
+      card.className = 'hover-card';
+      card.innerHTML = '<div class="hover-card-inner"><img alt="" style="display:none;"><div class="hover-card-title"></div><div class="hover-card-subtitle"></div></div>';
+      document.body.appendChild(card);
+      var cImg = card.querySelector('img'), cT = card.querySelector('.hover-card-title'), cS = card.querySelector('.hover-card-subtitle');
+      var vis = false;
+      function place(e){
+        var cw = card.offsetWidth || 296, ch = card.offsetHeight || 220, off = 20;
+        var x = e.clientX - cw/2, y = e.clientY - ch - off;
+        if (x + cw > window.innerWidth - 16) x = window.innerWidth - cw - 16;
+        if (x < 16) x = 16;
+        if (y < 16) y = e.clientY + off;
+        card.style.left = x + 'px'; card.style.top = y + 'px';
+      }
+      words.forEach(function(el){
+        el.addEventListener('mouseenter', function(e){
+          cT.textContent = el.getAttribute('data-title') || '';
+          cS.textContent = el.getAttribute('data-subtitle') || '';
+          cS.style.display = cS.textContent ? 'block' : 'none';
+          var img = el.getAttribute('data-image');
+          if (img) { cImg.src = img; cImg.style.display = 'block'; } else { cImg.style.display = 'none'; }
+          place(e); card.classList.add('visible'); vis = true;
+        });
+        el.addEventListener('mousemove', function(e){ if (vis) place(e); });
+        el.addEventListener('mouseleave', function(){ card.classList.remove('visible'); vis = false; });
+      });
+    })();
   })();
   </script>
 

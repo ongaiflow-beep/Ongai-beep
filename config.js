@@ -153,6 +153,18 @@ const SITE = {
       // Uncomment and fill to add team members:
       // { name: 'Your Name', role: 'Creative Director', photo: '' },
     ],
+    /* ── HOVER WORDS ─────────────────────────
+       Highlight words in the About body — each reveals a floating
+       preview card on hover. Manage these from the admin panel.
+       • word:     exact text in the body to make interactive
+       • title:    heading shown in the preview card
+       • subtitle: small line under the title
+       • image:    optional preview image (URL or uploaded)
+    ─────────────────────────────────────────── */
+    hovers: [
+      { word: 'business partner', title: 'A true partner', subtitle: 'We work as an extension of your team', image: '' },
+      { word: 'core problems', title: 'Root-cause thinking', subtitle: 'We fix the real problem, not the symptom', image: '' },
+    ],
   },
 
 };

@@ -342,6 +342,13 @@
           <label class="form-label">Body text <span style="color:rgba(255,255,255,.25);">(HTML allowed: &lt;em&gt; for italic yellow)</span></label>
           <textarea id="ab-body" class="form-input" rows="5"></textarea>
         </div>
+
+        <div class="divider"></div>
+        <p class="section-title">Hover Words <span style="color:rgba(20,17,5,.35);font-weight:400;text-transform:none;letter-spacing:0;"> — highlight words in the body that reveal a preview card on hover</span></p>
+        <div id="hovers-list"></div>
+        <button class="btn-add" onclick="addHoverWord()">+ Add hover word</button>
+
+        <div class="divider"></div>
         <div class="form-group">
           <label class="form-label">Quote</label>
           <input id="ab-quote" class="form-input" type="text">
@@ -601,6 +608,7 @@ function loadAll() {
   renderWork(d.work || []);
   renderValues((d.about && d.about.values) || []);
   renderTeam((d.about && d.about.team) || []);
+  renderHovers((d.about && d.about.hovers) || []);
 }
 
 /* ── SAVE ALL ── */
@@ -641,9 +649,10 @@ function saveAll() {
     // Work
     d.work = collectWork();
 
-    // About values & team
+    // About values, team & hover words
     d.about.values = collectValues();
     d.about.team   = collectTeam();
+    d.about.hovers = collectHovers();
 
     saveData(d);
     showToast('Changes saved!');
@@ -1052,6 +1061,80 @@ function collectValues() {
 }
 
 /* ══════════════════════════════
+   ABOUT: HOVER WORDS
+══════════════════════════════ */
+function renderHovers(list) {
+  const el = document.getElementById('hovers-list');
+  el.innerHTML = '';
+  list.forEach((h, i) => {
+    el.innerHTML += `
+    <div class="form-card" id="hov-card-${i}">
+      <div class="form-card-head">
+        <span class="form-card-num">HOVER ${String(i+1).padStart(2,'0')}</span>
+        <button class="btn-remove" onclick="removeHoverWord(${i})">Remove</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Word or phrase <span style="color:rgba(20,17,5,.35);">— must appear in the body text above</span></label>
+        <input id="hov-word-${i}" class="form-input" type="text" value="${esc(h.word||'')}" placeholder="e.g. business partner">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Preview title</label>
+          <input id="hov-title-${i}" class="form-input" type="text" value="${esc(h.title||'')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preview subtitle</label>
+          <input id="hov-sub-${i}" class="form-input" type="text" value="${esc(h.subtitle||'')}">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Preview image <span style="color:rgba(20,17,5,.35);">— optional</span></label>
+        <div class="img-upload-row">
+          <div class="img-preview" id="hov-prev-${i}" style="width:100px;height:65px;">
+            ${h.image ? `<img src="${h.image}" style="width:100%;height:100%;object-fit:cover;">` : '<svg width="18" height="12" viewBox="0 0 20 14" fill="none"><rect x="1" y="1" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5" opacity=".3"/></svg>'}
+          </div>
+          <button class="img-btn" onclick="document.getElementById('hov-file-${i}').click()">Upload image</button>
+        </div>
+        <input type="file" id="hov-file-${i}" accept="image/*" onchange="handleHoverImg(this, ${i})">
+      </div>
+    </div>`;
+  });
+}
+
+function addHoverWord() {
+  const list = collectHovers();
+  list.push({ word: '', title: '', subtitle: '', image: '' });
+  renderHovers(list);
+}
+
+function removeHoverWord(i) {
+  const list = collectHovers();
+  list.splice(i, 1);
+  renderHovers(list);
+}
+
+function collectHovers() {
+  const cards = document.querySelectorAll('[id^="hov-card-"]');
+  return Array.from(cards).map((_, i) => {
+    const img = document.querySelector(`#hov-prev-${i} img`);
+    return {
+      word:     document.getElementById(`hov-word-${i}`).value.trim(),
+      title:    document.getElementById(`hov-title-${i}`).value.trim(),
+      subtitle: document.getElementById(`hov-sub-${i}`).value.trim(),
+      image:    img ? img.src : '',
+    };
+  }).filter(h => h.word);
+}
+
+async function handleHoverImg(input, i) {
+  if (!input.files[0]) return;
+  try {
+    const url = await uploadImage(input.files[0], 640, 400, 0.72);
+    document.getElementById(`hov-prev-${i}`).innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  } catch(e) {}
+}
+
+/* ══════════════════════════════
    ABOUT: TEAM
 ══════════════════════════════ */
 function renderTeam(list) {
@@ -1321,6 +1404,7 @@ function generateConfigContent() {
   const clients = (d.clients||[]).map(c => `    { name: ${jsVal(c.name)}, image: ${jsVal(c.image)} },`).join('\n');
   const values = (d.about&&d.about.values||[]).map(v => `      ${jsVal(v)},`).join('\n');
   const team = (d.about&&d.about.team||[]).map(m => `      { name: ${jsVal(m.name)}, role: ${jsVal(m.role)}, photo: ${jsVal(m.photo)} },`).join('\n');
+  const hovers = (d.about&&d.about.hovers||[]).map(h => `      { word: ${jsVal(h.word)}, title: ${jsVal(h.title||'')}, subtitle: ${jsVal(h.subtitle||'')}, image: ${jsVal(h.image||'')} },`).join('\n');
   const ab = d.about || {};
 
   return `/**
@@ -1358,6 +1442,9 @@ ${values}
     teamPhoto: ${jsVal(ab.teamPhoto||'')},
     team: [
 ${team}
+    ],
+    hovers: [
+${hovers}
     ],
   },
 };
