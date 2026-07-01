@@ -148,15 +148,12 @@
 
 <main>
 
-  <!-- ── HERO ── -->
-  <section data-nav-theme="light" style="background:var(--wh);padding:11rem 0 5.5rem;">
+  <!-- ── HERO ── (same layout/style as the other page heroes) -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:10rem 0 5rem;">
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
-      <span class="eyebrow reveal">About — Ongai Flow</span>
-      <h1 class="h-hero reveal" id="about-headline" style="color:var(--dk);margin-top:2rem;"></h1>
-      <div class="reveal" style="display:flex;align-items:center;gap:1.25rem;margin-top:2.75rem;">
-        <span style="width:56px;height:3px;background:var(--y);border-radius:2px;flex-shrink:0;"></span>
-        <p id="about-tagline" style="font-family:var(--font-body);color:rgba(20,17,5,.45);font-size:.95rem;"></p>
-      </div>
+      <span class="reveal" style="font-family:var(--font-body);color:rgba(20,17,5,.38);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;display:block;margin-bottom:2rem;">01 — who we are</span>
+      <h1 class="h-hero reveal" id="about-headline" style="color:var(--dk);"></h1>
+      <p id="about-tagline" class="reveal" style="font-family:var(--font-body);color:rgba(20,17,5,.52);font-size:1.05rem;line-height:1.75;max-width:480px;margin-top:2rem;"></p>
     </div>
   </section>
 
@@ -165,8 +162,7 @@
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
       <div class="about-col">
         <div class="about-col-label reveal">
-          <span class="idx">01</span>
-          <span class="lbl">Who we are</span>
+          <span class="lbl">Our approach</span>
         </div>
         <p id="about-body" class="lead reveal"></p>
       </div>
@@ -186,7 +182,6 @@
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
       <div class="about-col">
         <div class="about-col-label reveal">
-          <span class="idx">02</span>
           <span class="lbl">What we stand for</span>
         </div>
         <div id="about-values" class="values-list reveal"></div>
@@ -209,7 +204,6 @@
       <div class="px-site" style="max-width:1320px;margin:0 auto;">
         <div class="about-col">
           <div class="about-col-label reveal">
-            <span class="idx">03</span>
             <span class="lbl">The people</span>
           </div>
           <div id="team-grid" style="display:grid;gap:2.75rem 2rem;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));"></div>
@@ -223,7 +217,12 @@
     var a = SITE.about || {};
 
     var hEl = document.getElementById('about-headline');
-    if (hEl) hEl.innerHTML = String(a.headline || 'flowing to\nthe core.').replace(/\n/g,'<br>');
+    if (hEl) {
+      var hl = String(a.headline || 'flowing to\nthe core.');
+      // Accent the last word in lime, like the other page heroes
+      hl = hl.replace(/(^|\s)(\S+)\s*$/, function(_, sp, last){ return sp + '<span class="text-y">' + last + '</span>'; });
+      hEl.innerHTML = hl.replace(/\n/g, '<br>');
+    }
 
     var tEl = document.getElementById('about-tagline');
     if (tEl) tEl.textContent = SITE.tagline || '';
