@@ -66,6 +66,11 @@
     .wc-view{font-family:var(--font-body);color:rgba(20,17,5,.4);font-weight:600;font-size:.8rem;margin-top:1rem;display:inline-block;transition:color .22s ease,transform .22s ease;}
     .work-cell:hover .wc-cat,.work-cell:hover .wc-view{color:var(--dk);}
     .work-cell:hover .wc-view{transform:translateX(4px);}
+    /* Feature (tall) project — full-width banner variant */
+    .work-cell.feature{grid-column:1 / -1;}
+    .work-cell.feature .work-cell-img{aspect-ratio:5/2;margin-bottom:1.75rem;}
+    .work-cell.feature .wc-title{font-size:clamp(1.9rem,3.6vw,3rem);}
+    @media(max-width:767px){.work-cell.feature .work-cell-img{aspect-ratio:16/10;}}
 
     /* Contact form */
     .field{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.15);color:var(--wh);font-family:var(--font-body);font-size:1rem;padding:.875rem 0;outline:none;transition:border-color .2s ease;-webkit-appearance:none;}
@@ -163,7 +168,7 @@
               var absIdx = (page - 1) * PER_PAGE + i;
               var img = w.image ? '<img src="' + w.image + '" alt="' + w.title + '">' : ph;
               grid.innerHTML +=
-                '<a href="project.html?i=' + absIdx + '" class="work-cell">' +
+                '<a href="project.html?i=' + absIdx + '" class="work-cell' + (w.tall ? ' feature' : '') + '">' +
                 '<div class="work-cell-img">' + img + '</div>' +
                 '<span class="wc-cat">' + w.category + ' · ' + w.year + '</span>' +
                 '<h2 class="wc-title">' + w.title + '</h2>' +
