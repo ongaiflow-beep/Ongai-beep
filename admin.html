@@ -1142,9 +1142,12 @@ function renderTeam(list) {
   el.innerHTML = '';
   list.forEach((m, i) => {
     el.innerHTML += `
-    <div class="form-card" id="team-card-${i}">
+    <div class="form-card" id="team-card-${i}" draggable="true">
       <div class="form-card-head">
-        <span class="form-card-num">MEMBER ${String(i+1).padStart(2,'0')}</span>
+        <div style="display:flex;align-items:center;">
+          <span class="drag-handle" title="Drag to reorder"><svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13.5" r="1.5"/><circle cx="7.5" cy="13.5" r="1.5"/></svg></span>
+          <span class="form-card-num">MEMBER ${String(i+1).padStart(2,'0')}</span>
+        </div>
         <button class="btn-remove" onclick="removeTeamMember(${i})">Remove</button>
       </div>
       <div class="form-row">
@@ -1168,6 +1171,47 @@ function renderTeam(list) {
         <input type="file" id="tm-file-${i}" accept="image/*" onchange="handleTeamMemberPhoto(this, ${i})">
       </div>
     </div>`;
+  });
+  initTeamDrag();
+}
+
+function initTeamDrag() {
+  const list = document.getElementById('team-list');
+  let dragSrc = null;
+
+  list.querySelectorAll('.form-card[draggable]').forEach(function(card) {
+    card.addEventListener('dragstart', function(e) {
+      dragSrc = this;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(function() { dragSrc && dragSrc.classList.add('dragging'); }, 0);
+    });
+    card.addEventListener('dragend', function() {
+      this.classList.remove('dragging');
+      list.querySelectorAll('.form-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      dragSrc = null;
+    });
+    card.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (this === dragSrc) return;
+      list.querySelectorAll('.form-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      this.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', function() {
+      this.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!dragSrc || this === dragSrc) return;
+      const allCards = Array.from(list.querySelectorAll('.form-card'));
+      const srcIdx  = allCards.indexOf(dragSrc);
+      const dstIdx  = allCards.indexOf(this);
+      const team = collectTeam();
+      const [moved] = team.splice(srcIdx, 1);
+      team.splice(dstIdx, 0, moved);
+      renderTeam(team);
+    });
   });
 }
 
