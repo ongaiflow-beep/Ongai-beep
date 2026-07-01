@@ -22,7 +22,7 @@
     body{font-family:var(--font-body);background:var(--wh);color:var(--dk);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
     .text-y{color:var(--y);}
     .px-site{padding-left:clamp(1.5rem,5vw,4rem);padding-right:clamp(1.5rem,5vw,4rem);}
-    .h-hero{font-family:var(--font-display);font-weight:900;font-size:clamp(3rem,6vw,7.5rem);line-height:.92;letter-spacing:-.02em;}
+    .h-hero{font-family:var(--font-display);font-weight:900;font-size:clamp(3rem,7vw,8rem);line-height:.9;letter-spacing:-.03em;}
     .h-xl{font-family:var(--font-display);font-weight:900;font-size:clamp(1.9rem,4.5vw,5rem);line-height:.95;}
     input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,textarea:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px var(--dk) inset !important;-webkit-text-fill-color:#fff !important;caret-color:#fff;transition:background-color 9999s ease;}
     ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--y);border-radius:4px;}
@@ -52,10 +52,39 @@
     .mob-link{font-family:var(--font-display);font-weight:900;font-size:clamp(2.2rem,8vw,3.5rem);color:rgba(255,255,255,.6);transition:color .2s ease;}
     .mob-link:hover{color:var(--y);}
 
-    .value-item{font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,3vw,2.4rem);font-style:italic;color:var(--dk);padding-bottom:.875rem;border-bottom:2px solid var(--y);margin-bottom:.375rem;}
-    .team-card{text-align:center;}
-    .team-photo{width:100%;aspect-ratio:3/4;object-fit:cover;background:#eeede8;display:block;margin-bottom:1rem;}
-    .team-ph{width:100%;aspect-ratio:3/4;background:#f0f0ee;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;}
+    /* ── About: shared ── */
+    .eyebrow{font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;display:block;}
+    .brand-em{font-style:italic;color:var(--y);}
+
+    /* Editorial 2-col with sticky label */
+    .about-col{display:block;}
+    @media(min-width:900px){.about-col{display:grid;grid-template-columns:220px 1fr;gap:5rem;align-items:start;}}
+    .about-col-label{margin-bottom:2rem;}
+    @media(min-width:900px){.about-col-label{position:sticky;top:7rem;margin-bottom:0;}}
+    .about-col-label .idx{font-family:var(--font-body);font-weight:600;font-size:.72rem;letter-spacing:.16em;color:var(--y);display:block;margin-bottom:.6rem;}
+    .about-col-label .lbl{font-family:var(--font-body);font-size:.92rem;color:rgba(20,17,5,.5);display:block;}
+
+    /* Lead body */
+    .lead{font-family:var(--font-body);font-weight:400;font-size:clamp(1.3rem,2vw,1.75rem);line-height:1.55;color:rgba(20,17,5,.82);max-width:40ch;}
+    .lead .brand-em{font-weight:500;}
+
+    /* Values list */
+    .values-list{border-top:1px solid rgba(20,17,5,.1);}
+    .value-row{display:flex;align-items:baseline;gap:1.75rem;padding:1.85rem 0;border-bottom:1px solid rgba(20,17,5,.1);transition:padding-left .35s cubic-bezier(.22,1,.36,1);}
+    .value-row:hover{padding-left:.85rem;}
+    .value-num{font-family:var(--font-body);font-size:.8rem;color:rgba(20,17,5,.3);min-width:2.4rem;transition:color .25s ease;}
+    .value-row:hover .value-num{color:var(--dk);}
+    .value-name{font-family:var(--font-display);font-weight:900;font-size:clamp(1.9rem,4vw,3.1rem);color:var(--dk);line-height:1;letter-spacing:-.015em;}
+
+    /* Pull quote (dark statement) */
+    .quote-mark{font-family:var(--font-display);font-weight:900;font-size:clamp(2.5rem,5vw,4rem);color:var(--y);line-height:1;display:block;margin-bottom:1.25rem;}
+    .pull-quote{font-family:var(--font-display);font-weight:900;font-size:clamp(1.9rem,4.8vw,4rem);line-height:1.08;letter-spacing:-.02em;color:var(--wh);font-style:normal;max-width:16ch;}
+
+    /* Team */
+    .team-card{text-align:left;}
+    .team-photo{width:100%;aspect-ratio:3/4;object-fit:cover;background:#eeede8;display:block;margin-bottom:1rem;filter:grayscale(1);transition:filter .4s ease;}
+    .team-card:hover .team-photo{filter:grayscale(0);}
+    .team-ph{width:100%;aspect-ratio:3/4;background:#f4f4f1;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;}
 
     .field{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.15);color:var(--wh);font-family:var(--font-body);font-size:1rem;padding:.875rem 0;outline:none;transition:border-color .2s ease;-webkit-appearance:none;}
     .field::placeholder{color:rgba(255,255,255,.65);}
@@ -68,10 +97,10 @@
     .form-msg{font-family:var(--font-body);font-size:.95rem;margin-top:1.5rem;}
     .form-msg.ok{color:var(--y);} .form-msg.err{color:#ff6b6b;}
 
-    .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1);}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1);}
     .reveal.in{opacity:1;transform:none;}
     @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
-    @media(min-width:1024px){.about-grid{grid-template-columns:1fr 1fr;} .contact-grid{grid-template-columns:1fr 1fr;}}
+    @media(min-width:1024px){.contact-grid{grid-template-columns:1fr 1fr;}}
   </style>
 </head>
 <body>
@@ -109,89 +138,120 @@
 
 <main>
 
-  <!-- Page header -->
-  <section data-nav-theme="light" style="background:var(--wh);padding:10rem 0 6rem;">
+  <!-- ── HERO ── -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:11rem 0 5.5rem;">
     <div class="px-site" style="max-width:1320px;margin:0 auto;">
-      <span style="font-family:var(--font-body);color:rgba(20,17,5,.38);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;display:block;margin-bottom:2rem;">01 — who we are</span>
-      <h1 class="h-hero" id="about-headline" style="color:var(--dk);">flowing to<br>the core.</h1>
-    </div>
-  </section>
-
-  <!-- Philosophy -->
-  <section data-nav-theme="light" style="background:var(--wh);padding:2rem 0 7rem;">
-    <div class="px-site" style="max-width:1320px;margin:0 auto;">
-      <div class="about-grid" style="display:grid;gap:5rem;align-items:start;">
-
-        <div class="reveal">
-          <p id="about-body" style="font-family:var(--font-body);color:rgba(20,17,5,.52);font-size:1.1rem;line-height:1.85;max-width:520px;"></p>
-          <div style="margin-top:3.5rem;padding:2rem;border-left:3px solid var(--y);background:#fafaf5;">
-            <p id="about-quote" style="font-family:var(--font-display);font-weight:900;color:var(--dk);font-size:clamp(1.4rem,2.5vw,2rem);line-height:1.2;"></p>
-          </div>
-        </div>
-
-        <div class="reveal" style="transition-delay:.1s;">
-          <p style="font-family:var(--font-body);color:rgba(20,17,5,.38);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:2rem;">our values</p>
-          <div id="about-values" style="display:flex;flex-direction:column;gap:.375rem;"></div>
-        </div>
-
+      <span class="eyebrow reveal">About — Ongai Flow</span>
+      <h1 class="h-hero reveal" id="about-headline" style="color:var(--dk);margin-top:2rem;"></h1>
+      <div class="reveal" style="display:flex;align-items:center;gap:1.25rem;margin-top:2.75rem;">
+        <span style="width:56px;height:3px;background:var(--y);border-radius:2px;flex-shrink:0;"></span>
+        <p id="about-tagline" style="font-family:var(--font-body);color:rgba(20,17,5,.45);font-size:.95rem;"></p>
       </div>
     </div>
   </section>
 
-  <script>
-  (function(){
-    const a = SITE.about;
-    document.getElementById('about-body').innerHTML = a.body;
-    document.getElementById('about-quote').textContent = a.quote;
-    const vEl = document.getElementById('about-values');
-    a.values.forEach(function(v){
-      vEl.innerHTML += `<div class="value-item">${v}</div>`;
-    });
-  })();
-  </script>
+  <!-- ── MANIFESTO / BODY ── -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:4rem 0 8rem;">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
+      <div class="about-col">
+        <div class="about-col-label reveal">
+          <span class="idx">01</span>
+          <span class="lbl">Who we are</span>
+        </div>
+        <p id="about-body" class="lead reveal"></p>
+      </div>
+    </div>
+  </section>
 
-  <!-- Team photo (optional) -->
+  <!-- ── QUOTE (dark statement) ── -->
+  <section id="quote-section" data-nav-theme="dark" style="background:var(--dk);padding:8rem 0;">
+    <div class="px-site" style="max-width:1100px;margin:0 auto;">
+      <span class="quote-mark reveal" aria-hidden="true">*</span>
+      <blockquote id="about-quote" class="pull-quote reveal"></blockquote>
+    </div>
+  </section>
+
+  <!-- ── VALUES ── -->
+  <section data-nav-theme="light" style="background:var(--wh);padding:8rem 0;">
+    <div class="px-site" style="max-width:1320px;margin:0 auto;">
+      <div class="about-col">
+        <div class="about-col-label reveal">
+          <span class="idx">02</span>
+          <span class="lbl">What we stand for</span>
+        </div>
+        <div id="about-values" class="values-list reveal"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TEAM PHOTO (optional) ── -->
   <div id="team-photo-wrap" style="display:none;">
-    <div style="height:5px;background:var(--y);"></div>
-    <section data-nav-theme="light" style="background:#f0f0ee;padding:0;">
-      <img id="team-photo-img" src="" alt="Ongai Flow team" style="width:100%;max-height:600px;object-fit:cover;display:block;">
-    </section>
-  </div>
-  <script>
-  (function(){
-    if(SITE.about.teamPhoto){
-      document.getElementById('team-photo-wrap').style.display='block';
-      document.getElementById('team-photo-img').src=SITE.about.teamPhoto;
-    }
-  })();
-  </script>
-
-  <!-- Team members (optional) -->
-  <div id="team-section" style="display:none;">
-    <section data-nav-theme="light" style="background:var(--wh);padding:6rem 0;">
+    <section data-nav-theme="light" style="background:var(--wh);padding:0 0 8rem;">
       <div class="px-site" style="max-width:1320px;margin:0 auto;">
-        <p style="font-family:var(--font-body);color:rgba(20,17,5,.38);font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:3rem;">the team</p>
-        <div id="team-grid" style="display:grid;gap:2.5rem;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));"></div>
+        <img id="team-photo-img" src="" alt="Ongai Flow studio" class="reveal" style="width:100%;max-height:620px;object-fit:cover;display:block;">
       </div>
     </section>
   </div>
+
+  <!-- ── TEAM MEMBERS (optional) ── -->
+  <div id="team-section" style="display:none;">
+    <section data-nav-theme="light" style="background:var(--wh);padding:0 0 9rem;">
+      <div class="px-site" style="max-width:1320px;margin:0 auto;">
+        <div class="about-col">
+          <div class="about-col-label reveal">
+            <span class="idx">03</span>
+            <span class="lbl">The people</span>
+          </div>
+          <div id="team-grid" style="display:grid;gap:2.75rem 2rem;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <script>
   (function(){
-    if(SITE.about.team && SITE.about.team.length){
-      document.getElementById('team-section').style.display='block';
-      const g=document.getElementById('team-grid');
-      SITE.about.team.forEach(function(m){
-        const photo=m.photo
-          ? `<img src="${m.photo}" alt="${m.name}" class="team-photo">`
-          : `<div class="team-ph"><svg width="40" height="40" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="rgba(20,17,5,.15)" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="rgba(20,17,5,.15)" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="rgba(20,17,5,.15)" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="rgba(20,17,5,.15)" stroke-width="2.5" stroke-linecap="round"/></svg></div>`;
-        g.innerHTML+=`<div class="team-card reveal">${photo}<p style="font-family:var(--font-display);font-weight:900;font-size:1.1rem;color:var(--dk);">${m.name}</p><p style="font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.85rem;margin-top:.25rem;">${m.role}</p></div>`;
+    var a = SITE.about || {};
+
+    var hEl = document.getElementById('about-headline');
+    if (hEl) hEl.innerHTML = String(a.headline || 'flowing to\nthe core.').replace(/\n/g,'<br>');
+
+    var tEl = document.getElementById('about-tagline');
+    if (tEl) tEl.textContent = SITE.tagline || '';
+
+    var bEl = document.getElementById('about-body');
+    if (bEl) bEl.innerHTML = a.body || '';
+
+    var qEl = document.getElementById('about-quote');
+    var qText = (a.quote || '').trim();
+    if (qText) { qEl.textContent = qText; }
+    else { document.getElementById('quote-section').style.display = 'none'; }
+
+    var vEl = document.getElementById('about-values');
+    (a.values || []).forEach(function(v, i){
+      vEl.innerHTML += '<div class="value-row"><span class="value-num">' + String(i+1).padStart(2,'0') + '</span><span class="value-name">' + v + '</span></div>';
+    });
+
+    if (a.teamPhoto) {
+      document.getElementById('team-photo-wrap').style.display = 'block';
+      document.getElementById('team-photo-img').src = a.teamPhoto;
+    }
+
+    if (a.team && a.team.length) {
+      document.getElementById('team-section').style.display = 'block';
+      var g = document.getElementById('team-grid');
+      a.team.forEach(function(m){
+        var photo = m.photo
+          ? '<img src="' + m.photo + '" alt="' + m.name + '" class="team-photo">'
+          : '<div class="team-ph"><svg width="40" height="26" viewBox="0 0 42 28" fill="none"><circle cx="14" cy="14" r="10" stroke="rgba(20,17,5,.15)" stroke-width="3.5" fill="none"/><line x1="31" y1="6" x2="31" y2="22" stroke="rgba(20,17,5,.15)" stroke-width="2.5" stroke-linecap="round"/><line x1="24.1" y1="10" x2="37.9" y2="18" stroke="rgba(20,17,5,.15)" stroke-width="2.5" stroke-linecap="round"/><line x1="37.9" y1="10" x2="24.1" y2="18" stroke="rgba(20,17,5,.15)" stroke-width="2.5" stroke-linecap="round"/></svg></div>';
+        g.innerHTML += '<div class="team-card reveal">' + photo +
+          '<p style="font-family:var(--font-body);font-weight:600;font-size:1rem;color:var(--dk);">' + m.name + '</p>' +
+          '<p style="font-family:var(--font-body);color:rgba(20,17,5,.4);font-size:.85rem;margin-top:.2rem;">' + m.role + '</p></div>';
       });
     }
   })();
   </script>
 
-
-  <!-- Contact -->
+  <!-- ── CONTACT ── -->
   <section id="contact" data-nav-theme="dark" style="position:relative;background:var(--dk);padding:8rem 0;overflow:hidden;">
     <div aria-hidden="true" style="position:absolute;bottom:-10%;right:-4%;font-family:var(--font-display);font-weight:900;font-size:clamp(14rem,35vw,50rem);color:var(--y);opacity:.05;line-height:.8;user-select:none;pointer-events:none;transform:translateY(10%);">*</div>
     <div class="px-site" style="max-width:1320px;margin:0 auto;position:relative;z-index:1;">
