@@ -185,7 +185,7 @@
           b.innerHTML = label;
           b.disabled = !enabled;
           b.setAttribute('aria-current', active ? 'page' : 'false');
-          var base = 'font-family:var(--font-display);font-weight:900;font-size:.9rem;min-width:3rem;padding:.6rem 1.25rem;border-radius:9999px;border:1.5px solid;cursor:pointer;transition:all .2s ease;';
+          var base = 'font-family:var(--font-body);font-weight:400;font-size:.9rem;min-width:3rem;padding:.6rem 1.25rem;border-radius:9999px;border:1.5px solid;cursor:pointer;transition:all .2s ease;';
           if (active) {
             b.style.cssText = base + 'background:var(--y);border-color:var(--y);color:var(--dk);cursor:default;';
           } else if (enabled) {
