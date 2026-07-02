@@ -1,9 +1,31 @@
+# ─────────────────────────────────────────────────────────────
+#  Auto-deploy the site to Hostinger via FTP.
+#
+#  Runs whenever the deploy branch is updated — which is exactly
+#  what the admin panel's "Publish live" button does. So:
+#     Admin → Publish live  →  GitHub  →  (this action)  →  Hostinger
+#
+#  ONE-TIME SETUP — add these repo secrets:
+#    GitHub repo → Settings → Secrets and variables → Actions → New secret
+#      FTP_SERVER    Hostinger FTP host (hPanel → Files → FTP Accounts),
+#                    e.g.  ftp.ongaiflow.com  or the server IP
+#      FTP_USERNAME  the FTP account username (e.g. u1234567.ongaiflow.com)
+#      FTP_PASSWORD  the FTP account password
+#
+#  server-dir is set to public_html/ (Hostinger's web root). If your FTP
+#  account already opens inside public_html, change it to ./ below.
+# ─────────────────────────────────────────────────────────────
 name: Deploy to Hostinger
 
 on:
   push:
     branches:
-      - cloudflare/workers-autoconfig
+      - cloudflare/workers-autoconfig   # the branch "Publish live" pushes to
+  workflow_dispatch:                     # also allow manual runs from the Actions tab
+
+concurrency:
+  group: hostinger-deploy
+  cancel-in-progress: true               # if several pushes land quickly, only deploy the latest
 
 jobs:
   ftp-deploy:
@@ -21,7 +43,16 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: ./public_html/
+          # Ship only the real website files; skip repo/tooling folders.
           exclude: |
             **/.git*
             **/.git*/**
             **/.github/**
+            **/node_modules/**
+            worker/**
+            wireframes/**
+            wrangler.jsonc
+            wrangler.toml
+            package.json
+            package-lock.json
+            README.md

@@ -245,6 +245,13 @@
       </div>
     </div>
 
+    <div id="publish-reminder" style="display:flex;align-items:center;gap:.65rem;padding:.7rem 2rem;background:rgba(218,237,0,.16);border-bottom:1px solid rgba(0,0,0,.06);font-family:var(--font);font-size:.8rem;color:rgba(20,17,5,.72);line-height:1.45;">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5" opacity=".55"/><path d="M10 6.2v4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="10" cy="14" r="1" fill="currentColor"/></svg>
+      <span style="flex:1;">Changes are saved in <strong>this browser only</strong>. Click <strong>Publish live</strong> to update your site — nothing goes live on ongaiflow.com until you do.</span>
+      <button type="button" onclick="document.getElementById('publish-reminder').style.display='none';sessionStorage.setItem('ongai_hide_reminder','1');" title="Dismiss" style="background:none;border:none;color:rgba(20,17,5,.4);cursor:pointer;font-size:1.15rem;line-height:1;padding:0 .25rem;flex-shrink:0;">&times;</button>
+    </div>
+    <script>if(sessionStorage.getItem('ongai_hide_reminder'))document.getElementById('publish-reminder').style.display='none';</script>
+
     <div class="content">
 
       <!-- ── GENERAL ── -->
