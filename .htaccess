@@ -1,0 +1,14 @@
+# ── Ongai Flow — server config for Hostinger (Apache / LiteSpeed) ──
+
+# Default page for the folder
+DirectoryIndex index.html
+
+# Serve pages without the .html extension.
+#   ongaiflow.com/admin     → admin.html
+#   ongaiflow.com/work      → work.html
+#   ongaiflow.com/services  → services.html   (and so on)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.+)$ $1.html [L]
